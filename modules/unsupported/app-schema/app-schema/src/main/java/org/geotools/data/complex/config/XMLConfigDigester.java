@@ -38,8 +38,8 @@ import org.xml.sax.SAXException;
  * @author Rini Angreani, Curtin University of Technology
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Russell Petty, GSV
- * @version $Id: XMLConfigDigester.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
+ * @version $Id: XMLConfigDigester.java 35182 2010-04-07 06:58:28Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/config/XMLConfigDigester.java $
  * @since 2.4
  */
 public class XMLConfigDigester {
@@ -62,12 +62,12 @@ public class XMLConfigDigester {
      * {@link AppSchemaDataAccessDTO}
      * 
      * @param dataStoreConfigUrl
-     *                config file location
+     *            config file location
      * 
      * @return a DTO object representing the datastore's configuration
      * 
      * @throws IOException
-     *                 if an error occurs parsing the file
+     *             if an error occurs parsing the file
      */
     public AppSchemaDataAccessDTO parse(URL dataStoreConfigUrl) throws IOException {
         AppSchemaDataAccessDTO config = digest(dataStoreConfigUrl);
@@ -78,14 +78,14 @@ public class XMLConfigDigester {
      * DOCUMENT ME!
      * 
      * @param dataStoreConfigUrl
-     *                DOCUMENT ME!
+     *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      * 
      * @throws IOException
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      * @throws NullPointerException
-     *                 DOCUMENT ME!
+     *             DOCUMENT ME!
      */
     private AppSchemaDataAccessDTO digest(final URL dataStoreConfigUrl) throws IOException {
         if (dataStoreConfigUrl == null) {
@@ -100,7 +100,7 @@ public class XMLConfigDigester {
             if (configStream == null) {
                 throw new IOException("Can't open datastore config file " + dataStoreConfigUrl);
             } else {
-               configString = PropertyInterpolationUtils.interpolate(PropertyInterpolationUtils
+                configString = PropertyInterpolationUtils.interpolate(PropertyInterpolationUtils
                         .loadProperties(AppSchemaDataAccessFactory.DBTYPE_STRING),
                         PropertyInterpolationUtils.readAll(configStream));
             }
@@ -109,7 +109,7 @@ public class XMLConfigDigester {
                 configStream.close();
             }
         }
-        
+
         XMLConfigDigester.LOGGER.fine("parsing complex datastore config: "
                 + dataStoreConfigUrl.toExternalForm());
 
@@ -132,7 +132,7 @@ public class XMLConfigDigester {
             setNamespacesRules(digester);
 
             setIncludedTypesRules(digester);
-            
+
             setSourceDataStoresRules(digester);
 
             setTargetSchemaUriRules(digester);
@@ -168,6 +168,8 @@ public class XMLConfigDigester {
         final String typeMapping = mappings + "/FeatureTypeMapping";
 
         digester.addObjectCreate(typeMapping, XMLConfigDigester.CONFIG_NS_URI, TypeMapping.class);
+        digester.addCallMethod(typeMapping + "/mappingName", "setMappingName", 1);
+        digester.addCallParam(typeMapping + "/mappingName", 0);
         digester.addCallMethod(typeMapping + "/sourceDataStore", "setSourceDataStore", 1);
         digester.addCallParam(typeMapping + "/sourceDataStore", 0);
         digester.addCallMethod(typeMapping + "/sourceType", "setSourceTypeName", 1);
@@ -176,12 +178,12 @@ public class XMLConfigDigester {
         digester.addCallParam(typeMapping + "/targetElement", 0);
         digester.addCallMethod(typeMapping + "/itemXpath", "setItemXpath", 1);
         digester.addCallParam(typeMapping + "/itemXpath", 0);
-        
+
         // isXmlDataStore is a flag to denote that AppSchema needs to process
-        //the data from the datastore differently as it returns xml rather than features.        
+        // the data from the datastore differently as it returns xml rather than features.
         digester.addCallMethod(typeMapping + "/isXmlDataStore", "setXmlDataStore", 1);
         digester.addCallParam(typeMapping + "/isXmlDataStore", 0);
-        
+
         // create attribute mappings
         final String attMappings = typeMapping + "/attributeMappings";
         digester.addObjectCreate(attMappings, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
@@ -194,13 +196,12 @@ public class XMLConfigDigester {
 
         digester.addCallMethod(attMap + "/parentLabel", "setParentLabel", 1);
         digester.addCallParam(attMap + "/parentLabel", 0);
-        
+
         digester.addCallMethod(attMap + "/targetQueryString", "setTargetQueryString", 1);
         digester.addCallParam(attMap + "/targetQueryString", 0);
-        
+
         digester.addCallMethod(attMap + "/instancePath", "setInstancePath", 1);
         digester.addCallParam(attMap + "/instancePath", 0);
-        
 
         digester.addCallMethod(attMap + "/isMultiple", "setMultiple", 1);
         digester.addCallParam(attMap + "/isMultiple", 0);
@@ -222,7 +223,8 @@ public class XMLConfigDigester {
         digester.addCallParam(attMap + "/idExpression/inputAttribute", 0);
 
         // if the source is a data access, then the input is in XPath expression
-        digester.addCallMethod(attMap + "/sourceExpression/inputAttribute", "setInputAttributePath", 1);
+        digester.addCallMethod(attMap + "/sourceExpression/inputAttribute",
+                "setInputAttributePath", 1);
         digester.addCallParam(attMap + "/sourceExpression/inputAttribute", 0);
 
         // for feature chaining: this refers to the nested feature type
@@ -282,7 +284,7 @@ public class XMLConfigDigester {
         digester.addCallParam(dataStores + "/DataStore/parameters/Parameter/name", 0);
         digester.addCallParam(dataStores + "/DataStore/parameters/Parameter/value", 1);
         digester.addSetNext(dataStores + "/DataStore/parameters", "setParams");
-        
+
         // isDataAccess is a flag to denote that we want to connect to the data access
         // that is connected to the data store specified
         digester.addCallMethod(dataStores + "/DataStore/isDataAccess", "setDataAccess", 1);
@@ -303,7 +305,7 @@ public class XMLConfigDigester {
         digester.addCallParam(ns + "/Namespace/uri", 1);
         digester.addSetNext(ns, "setNamespaces");
     }
-    
+
     private void setIncludedTypesRules(Digester digester) {
         final String includes = "AppSchemaDataAccess/includedTypes";
         digester.addObjectCreate(includes, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);

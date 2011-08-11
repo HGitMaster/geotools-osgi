@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
@@ -36,13 +37,17 @@ import org.geotools.data.Query;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.complex.filter.XPath.Step;
 import org.geotools.data.complex.filter.XPath.StepList;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeBuilder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureImpl;
 import org.geotools.feature.Types;
+import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.type.ComplexFeatureTypeImpl;
+import org.geotools.feature.type.GeometryDescriptorImpl;
+import org.geotools.feature.type.GeometryTypeImpl;
 import org.geotools.filter.AttributeExpressionImpl;
-import org.geotools.filter.FidFilterImpl;
-import org.geotools.xlink.XLINK;
+import org.geotools.filter.FilterFactoryImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
@@ -50,8 +55,10 @@ import org.opengis.feature.Property;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
-import org.opengis.filter.Filter;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.identity.FeatureId;
@@ -70,7 +77,7 @@ import org.xml.sax.Attributes;
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
  * @author Russell Petty, GSV
- * @version $Id: DataAccessMappingFeatureIterator.java 34870 2010-02-05 11:05:15Z ang05a $
+ * @version $Id: DataAccessMappingFeatureIterator.java 35975 2010-08-02 07:09:35Z ang05a $
  * @source $URL:
  *         http://svn.osgeo.org/geotools/trunk/modules/unsupported/app-schema/app-schema/src/main
  *         /java/org/geotools/data/complex/DataAccessMappingFeatureIterator.java $
@@ -78,44 +85,38 @@ import org.xml.sax.Attributes;
  */
 public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIterator {
     /**
-     * Name representation of xlink:href
-     */
-    public static final Name XLINK_HREF_NAME = Types.toTypeName(XLINK.HREF);
-
-    /**
      * Hold on to iterator to allow features to be streamed.
      */
-    protected Iterator<Feature> sourceFeatureIterator;
+    private Iterator<Feature> sourceFeatureIterator;
 
     /**
      * Reprojected CRS from the source simple features, or null
      */
-    private CoordinateReferenceSystem reprojection;
+    protected CoordinateReferenceSystem reprojection;
 
     /**
      * This is the feature that will be processed in next()
      */
-    private Feature curSrcFeature;
+    protected Feature curSrcFeature;
 
-    private FeatureSource<FeatureType, Feature> mappedSource;
+    protected FeatureSource<FeatureType, Feature> mappedSource;
 
-    private FeatureCollection<FeatureType, Feature> sourceFeatures;
+    protected FeatureCollection<FeatureType, Feature> sourceFeatures;
 
-    /**
-     * Filter that has that attributes from nested features as parameter. To be applied per feature
-     * when computeNext() is called.
-     */
-    private Filter nestedAttributeFilter;
+    private boolean isNextFeatureSet;
 
-    /**
-     * True if the query is filtered by attributes other than id, this is to cater for denormalised 
-     * view where there can be multiple rows for 1 complex feature with different values. If the
-     * filter is applied when the iterator is created, there's a chance some information is lost 
-     * from rows from denormalised view not being incorporated into the target feature.
-     */
+    private boolean isDenormalised;
+
     private boolean isFiltered;
 
     private ArrayList<String> filteredFeatures;
+
+    private AttributeDescriptor targetNode;
+    
+    public DataAccessMappingFeatureIterator(AppSchemaDataAccess store, FeatureTypeMapping mapping,
+            Query query, boolean isFiltered, boolean isDenormalised) throws IOException {
+        this(store, mapping, query, isFiltered, isDenormalised, false);
+    }
 
     /**
      * 
@@ -129,41 +130,44 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
      * @throws IOException
      */
     public DataAccessMappingFeatureIterator(AppSchemaDataAccess store, FeatureTypeMapping mapping,
-            Query query) throws IOException {
-        super(store, mapping, query);
+            Query query, boolean isFiltered, boolean isDenormalised, boolean isQueryUnrolled)
+            throws IOException {
+        super(store, mapping, query, isQueryUnrolled);
+        this.isDenormalised = isDenormalised;
+        this.isFiltered = isFiltered;
+        if (isDenormalised && isFiltered) {
+            filteredFeatures = new ArrayList<String>();
+        }
     }
 
+    @Override
     public boolean hasNext() {
-        if (isHasNextCalled()) {
-            return curSrcFeature != null;
-        }
+        setHasNextCalled(true);
 
         boolean exists = false;
 
-        if ((curSrcFeature != null || sourceFeatureIterator != null)
-                && featureCounter < maxFeatures) {
-            boolean hasNextSrc = (curSrcFeature != null || sourceFeatureIterator.hasNext());
-
-            while (hasNextSrc) {
-                if (this.curSrcFeature == null) {
-                    this.curSrcFeature = sourceFeatureIterator.next();
+        if (featureCounter < maxFeatures) {
+            if (isNextFeatureSet()) {
+                flagNextFeature(false);
+                return curSrcFeature != null;
+            }
+            if (getSourceFeatureIterator() != null && getSourceFeatureIterator().hasNext()) {
+                this.curSrcFeature = getSourceFeatureIterator().next();
+                exists = true;
+            }
+            if (exists && filteredFeatures != null) {
+                // get the next one if this row has already been added to the target
+                // feature from setNextFilteredFeature
+                while (exists && filteredFeatures.contains(extractIdForFeature(this.curSrcFeature))) {
+                    if (getSourceFeatureIterator() != null && getSourceFeatureIterator().hasNext()) {
+                        this.curSrcFeature = getSourceFeatureIterator().next();
+                        exists = true;
+                    } else {
+                        exists = false;
+                    }
                 }
-                if (isFiltered
-                        && filteredFeatures.contains(extractIdForFeature(this.curSrcFeature))) {
-                    // get the next one as this row would've been already added to the target
-                    // feature
-                    // from setNextFilteredFeature
-                    hasNextSrc = sourceFeatureIterator.hasNext();
+                if (!exists) {
                     curSrcFeature = null;
-                } else if (nestedAttributeFilter != null
-                        && !nestedAttributeFilter.evaluate(curSrcFeature)) {
-                    // get the next one
-                    hasNextSrc = sourceFeatureIterator.hasNext();
-                    curSrcFeature = null;
-                } else {
-                    // either there's no filter or that it passed the filter, so return it
-                    exists = true;
-                    hasNextSrc = false;
                 }
             }
         }
@@ -173,7 +177,9 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
             close();
             curSrcFeature = null;
         }
-        setHasNextCalled(true);
+
+        flagNextFeature(false);
+
         return exists;
     }
 
@@ -189,50 +195,61 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
             throws IOException {
         mappedSource = mapping.getSource();
         this.reprojection = query.getCoordinateSystemReproject();
-        Filter filter = getAttributeFilter(query);
-        if (filter != null) {
-            isFiltered = true;
-            filteredFeatures = new ArrayList<String>();
+        // we need to disable the max number of features retrieved so we can
+        // sort them manually just in case the data is denormalised
+        if (!(query instanceof DefaultQuery)) {
+            query = new DefaultQuery(query);
         }
-        try {
-            sourceFeatures = mappedSource.getFeatures(query);
-            this.sourceFeatureIterator = sourceFeatures.iterator();
-        } catch (IllegalArgumentException e) {
-            // HACK HACK HACK
-            // This is the only way we can check if the filter attributes are nested or not
-            // since there's no expression getter method for every implementation of filters.
-            // Remove the suspected filter from the query, and run it against each complex feature later
-            // because JDBCFeatureSource cannot handle nested queries, since it translates
-            // it to SQL first, then run the big query, but there's no way it can find the nested
-            // feature type name from there.
-            // Whereas with PropertyFeatureSource, it just runs the query first with no filters, then
-            // check every row against the filter, which is what we're trying to do here.
-            if (filter != null) {
-                ((DefaultQuery) query).setFilter(Filter.INCLUDE);
-                nestedAttributeFilter = filter;
-                sourceFeatures = mappedSource.getFeatures(query);
-                this.sourceFeatureIterator = sourceFeatures.iterator();
-                return;
-            }
-            throw e;
-        }
+        ((DefaultQuery) query).setMaxFeatures(Query.DEFAULT_MAX);
+        sourceFeatures = mappedSource.getFeatures(query);
+        this.sourceFeatureIterator = sourceFeatures.iterator();
+        setTargetNode(mapping);
     }
 
-    private Filter getAttributeFilter(Query query) {
-        if (query instanceof DefaultQuery) {
-            Filter filter = ((DefaultQuery) query).getFilter();
-            if (filter != null && filter != Filter.INCLUDE && !(filter instanceof FidFilterImpl)) {
-                return filter;
+    private void setTargetNode(FeatureTypeMapping mapping) {
+        if (reprojection != null) {
+            // update CRS if necessary
+            AttributeType type = mapping.getTargetFeature().getType();
+            if (type instanceof ComplexFeatureTypeImpl) {
+                ComplexFeatureTypeImpl fType = (ComplexFeatureTypeImpl) type;
+                Collection<PropertyDescriptor> newDescriptors = new ArrayList<PropertyDescriptor>(
+                        fType.getDescriptors().size());
+                for (PropertyDescriptor descriptor : fType.getDescriptors()) {
+                    if (descriptor instanceof GeometryDescriptor) {
+                        GeometryType origType = (GeometryType) descriptor.getType();
+                        GeometryType geomType = new GeometryTypeImpl(origType.getName(), origType
+                                .getBinding(), reprojection, origType.isIdentified(), origType
+                                .isAbstract(), origType.getRestrictions(), origType.getSuper(),
+                                origType.getDescription());
+                        geomType.getUserData().putAll(origType.getUserData());
+
+                        GeometryDescriptor newDescriptor = new GeometryDescriptorImpl(geomType,
+                                descriptor.getName(), descriptor.getMinOccurs(), descriptor
+                                        .getMaxOccurs(), descriptor.isNillable(),
+                                ((GeometryDescriptor) descriptor).getDefaultValue());
+                        newDescriptor.getUserData().putAll(descriptor.getUserData());
+                        newDescriptors.add(newDescriptor);
+                    } else {
+                        newDescriptors.add(descriptor);
+                    }
+                }
+                AttributeDescriptor targetFeature = mapping.getTargetFeature();
+                targetNode = new AttributeDescriptorImpl(
+                        new ComplexFeatureTypeImpl(fType, newDescriptors), targetFeature.getName(),
+                        targetFeature.getMinOccurs(), targetFeature.getMaxOccurs(), targetFeature
+                                .isNillable(), targetFeature.getDefaultValue());
+                targetNode.getUserData().putAll(targetFeature.getUserData());
             }
+        } else {
+            targetNode = mapping.getTargetFeature();
         }
-        return null;
     }
 
     protected boolean unprocessedFeatureExists() {
 
-        boolean exists = sourceFeatureIterator.hasNext();
+        boolean exists = getSourceFeatureIterator().hasNext();
         if (exists && this.curSrcFeature == null) {
-            this.curSrcFeature = sourceFeatureIterator.next();
+            this.curSrcFeature = getSourceFeatureIterator().next();
         }
 
         return exists;
@@ -242,7 +259,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         return extractIdForFeature(curSrcFeature);
     }
 
-    private String extractIdForFeature(Feature feature) {
+    protected String extractIdForFeature(Feature feature) {
         ComplexAttribute sourceInstance = (ComplexAttribute) feature;
         return (String) featureFidMapping.evaluate(sourceInstance, String.class);
     }
@@ -299,15 +316,38 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
      * 
      * @return Feature. Target feature sets with simple attributes
      */
-    protected void setAttributeValue(Feature target, final ComplexAttribute source,
+    protected void setAttributeValue(Attribute target, final Feature source,
             final AttributeMapping attMapping) throws IOException {
 
         final Expression sourceExpression = attMapping.getSourceExpression();
         final AttributeType targetNodeType = attMapping.getTargetNodeInstance();
         final StepList xpath = attMapping.getTargetXPath();
         Map<Name, Expression> clientPropsMappings = attMapping.getClientProperties();
-
         boolean isNestedFeature = attMapping.isNestedAttribute();
+        String id = null;
+        if (Expression.NIL != attMapping.getIdentifierExpression()) {
+            id = extractIdForAttribute(attMapping.getIdentifierExpression(), source);
+        }
+        if (attMapping.isNestedAttribute()) {
+            NestedAttributeMapping nestedMapping = ((NestedAttributeMapping) attMapping);
+            Object mappingName = nestedMapping.getNestedFeatureType(source);
+            if (mappingName != null) {
+                if (nestedMapping.isSameSource() && mappingName instanceof Name) {
+                    // data type polymorphism mapping
+                    setPolymorphicValues((Name) mappingName, target, id, nestedMapping, source,
+                            xpath, clientPropsMappings);
+                    return;
+                } else if (mappingName instanceof Hints) {
+                    // referential polymorphism mapping
+                    setPolymorphicReference((Hints) mappingName, clientPropsMappings, target,
+                            xpath, targetNodeType);
+                    return;
+                }
+            } else {
+                // polymorphism could result in null, to skip the attribute
+                return;
+            }
+        }
         Object value = getValues(attMapping.isMultiValued(), sourceExpression, source);
         boolean isHRefLink = isByReference(clientPropsMappings, isNestedFeature);
         if (isNestedFeature) {
@@ -331,10 +371,10 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                         // eg. gsml:GeologicUnit/gsml:occurence/gsml:MappedFeature
                         // and gsml:MappedFeature/gsml:specification/gsml:GeologicUnit
                         nestedFeatures.addAll(((NestedAttributeMapping) attMapping)
-                                .getInputFeatures(val, reprojection));
+                                .getInputFeatures(val, reprojection, source));
                     } else {
                         nestedFeatures.addAll(((NestedAttributeMapping) attMapping).getFeatures(
-                                val, reprojection));
+                                val, reprojection, source));
                     }
                 }
                 value = nestedFeatures;
@@ -343,9 +383,11 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                 // feature type also have a reference back to this type
                 // eg. gsml:GeologicUnit/gsml:occurence/gsml:MappedFeature
                 // and gsml:MappedFeature/gsml:specification/gsml:GeologicUnit
-                value = ((NestedAttributeMapping) attMapping).getInputFeatures(value, reprojection);
+                value = ((NestedAttributeMapping) attMapping).getInputFeatures(value, reprojection,
+                        source);
             } else {
-                value = ((NestedAttributeMapping) attMapping).getFeatures(value, reprojection);
+                value = ((NestedAttributeMapping) attMapping).getFeatures(value, reprojection,
+                        source);
             }
             if (isHRefLink) {
                 // only need to set the href link value, not the nested feature properties
@@ -353,12 +395,11 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                 return;
             }
         }
-        String id = null;
-        if (Expression.NIL != attMapping.getIdentifierExpression()) {
-            id = extractIdForAttribute(attMapping.getIdentifierExpression(), source);
-        }
         if (isNestedFeature) {
-            assert (value instanceof Collection);
+            if (value == null) {
+                // polymorphism use case, if the value doesn't match anything, don't encode
+                return;
+            }
         }
         if (value instanceof Collection) {
             // nested feature type could have multiple instances as the whole purpose
@@ -390,7 +431,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                     valueList.add(singleVal);
                 }
                 Attribute instance = xpathAttributeBuilder.set(target, xpath, valueList, id,
-                        targetNodeType, false);
+                        targetNodeType, false, sourceExpression);
                 setClientProperties(instance, source, valueProperties);
             }
         } else {
@@ -405,8 +446,88 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                 value = ((Attribute) value).getValue();
             }
             Attribute instance = xpathAttributeBuilder.set(target, xpath, value, id,
-                    targetNodeType, false);
+                    targetNodeType, false, sourceExpression);
             setClientProperties(instance, source, clientPropsMappings);
+
+        }
+    }
+
+    /**
+     * Special handling for polymorphic mapping where the value of the attribute determines that
+     * this attribute should be a placeholder for an xlink:href.
+     * 
+     * @param xlinkHrefHints
+     *            the xlink:href hints holding the URI
+     * @param clientPropsMappings
+     *            client properties
+     * @param target
+     *            the complex feature being built
+     * @param xpath
+     *            the xpath of attribute
+     * @param targetNodeType
+     *            the type of the attribute to be cast to, if any
+     */
+    private void setPolymorphicReference(Hints xlinkHrefHints,
+            Map<Name, Expression> clientPropsMappings, Attribute target, StepList xpath,
+            AttributeType targetNodeType) {
+
+        Object uri = xlinkHrefHints.get(ComplexFeatureConstants.STRING_KEY);
+        if (uri != null) {
+            Attribute instance = xpathAttributeBuilder.set(target, xpath, null, "", targetNodeType,
+                    true, null);
+            FilterFactoryImpl ff = new FilterFactoryImpl();
+            Map<Name, Expression> newClientProps = new HashMap<Name, Expression>();
+            newClientProps.putAll(clientPropsMappings);
+            newClientProps.put(XLINK_HREF_NAME, ff.literal(uri));
+            setClientProperties(instance, null, newClientProps);
+        }
+    }
+
+    /**
+     * Special handling for polymorphic mapping. Works out the polymorphic type name by evaluating
+     * the function on the feature, then set the relevant sub-type values.
+     * 
+     * @param target
+     *            The target feature to be encoded
+     * @param id
+     *            The target feature id
+     * @param nestedMapping
+     *            The mapping that is polymorphic
+     * @param source
+     *            The source simple feature
+     * @param xpath
+     *            The xpath of polymorphic type
+     * @param clientPropsMappings
+     *            Client properties
+     * @throws IOException
+     */
+    private void setPolymorphicValues(Name mappingName, Attribute target, String id,
+            NestedAttributeMapping nestedMapping, Feature source, StepList xpath,
+            Map<Name, Expression> clientPropsMappings) throws IOException {
+        // process sub-type mapping
+        DataAccess<FeatureType, Feature> da = DataAccessRegistry.getDataAccess((Name) mappingName);
+        if (da instanceof AppSchemaDataAccess) {
+            // why wouldn't it be? check just to be safe
+            FeatureTypeMapping fTypeMapping = ((AppSchemaDataAccess) da)
+                    .getMappingByName((Name) mappingName);
+            List<AttributeMapping> polymorphicMappings = fTypeMapping.getAttributeMappings();
+            AttributeDescriptor attDescriptor = fTypeMapping.getTargetFeature();
+            Name polymorphicTypeName = attDescriptor.getName();
+            StepList prefixedXpath = xpath.clone();
+            prefixedXpath.add(new Step(new QName(polymorphicTypeName.getNamespaceURI(),
+                    polymorphicTypeName.getLocalPart(), this.namespaces
+                            .getPrefix(polymorphicTypeName.getNamespaceURI())), 1));
+            Attribute instance = xpathAttributeBuilder.set(target, prefixedXpath, null, id,
+                    attDescriptor.getType(), false, attDescriptor, null);
+            setClientProperties(instance, source, clientPropsMappings);
+            for (AttributeMapping mapping : polymorphicMappings) {
+                if (isTopLevelmapping(polymorphicTypeName, mapping.getTargetXPath())) {
+                    // ignore the top level mapping for the Feature itself
+                    // as it was already set
+                    continue;
+                }
+                setAttributeValue(instance, source, mapping);
+            }
         }
     }
 
@@ -416,7 +537,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
      * xLink. Also we need to eliminate duplicates.
      * 
      * @param target
-     *            The target feature
+     *            The target attribute
      * @param clientPropsMappings
      *            Client properties mappings
      * @param value
@@ -426,7 +547,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
      * @param targetNodeType
      *            Target node type
      */
-    protected void setXlinkReference(Feature target, Map<Name, Expression> clientPropsMappings,
+    protected void setXlinkReference(Attribute target, Map<Name, Expression> clientPropsMappings,
             Object value, StepList xpath, AttributeType targetNodeType) {
         // Make sure the same value isn't already set
         // in case it comes from a denormalized view for many-to-many relationship.
@@ -446,7 +567,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
                     assert linkExpression != null;
                     Object hrefValue = linkExpression.evaluate(singleVal);
                     if (hrefValue != null && hrefValue.equals(existingValue)) {
-                        // (2) if one of the new values matches the first existing value, 
+                        // (2) if one of the new values matches the first existing value,
                         // that means this comes from a denormalized view,
                         // and this set has already been set
                         return;
@@ -458,14 +579,14 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         for (Object singleVal : (Collection) value) {
             assert singleVal instanceof Feature;
             Attribute instance = xpathAttributeBuilder.set(target, xpath, null, null,
-                    targetNodeType, true);
+                    targetNodeType, true, null);
             setClientProperties(instance, singleVal, clientPropsMappings);
         }
     }
 
     protected void setClientProperties(final Attribute target, final Object source,
             final Map<Name, Expression> clientProperties) {
-        if (clientProperties.size() == 0) {
+        if (clientProperties.size() == 0 || target == null) {
             return;
         }
         final Map<Name, Object> targetAttributes = new HashMap<Name, Object>();
@@ -480,11 +601,14 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
             }
             targetAttributes.put(propName, propValue);
         }
-        // FIXME should set a child Property
+        // FIXME should set a child Property.. but be careful for things that
+        // are smuggled in there internally and don't exist in the schema, like
+        // XSDTypeDefinition, CRS etc.
         target.getUserData().put(Attributes.class, targetAttributes);
     }
 
-    private Map getClientProperties(Attribute attribute) throws DataSourceException {
+    private Map getClientProperties(Property attribute) throws DataSourceException {
+
         Map<Object, Object> userData = attribute.getUserData();
         Map clientProperties = new HashMap<Name, Expression>();
         if (userData != null && userData.containsKey(Attributes.class)) {
@@ -494,6 +618,24 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
             }
         }
         return clientProperties;
+    }
+
+    protected void setNextFeature(String fId, ArrayList<Feature> features) throws IOException {
+        if (features.isEmpty()) {
+            features.add(curSrcFeature);
+        }
+        curSrcFeature = null;
+
+        while (getSourceFeatureIterator().hasNext()) {
+            Feature next = getSourceFeatureIterator().next();
+            if (extractIdForFeature(next).equals(fId)) {
+                features.add(next);
+            } else {
+                curSrcFeature = next;
+                flagNextFeature(true);
+                break;
+            }
+        }
     }
 
     private void setNextFilteredFeature(String fId, ArrayList<Feature> features) throws IOException {
@@ -514,8 +656,8 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         } else {
             // in case the expression is wrapped in a function, eg. strConcat
             // that's why we don't always filter by id, but do a PropertyIsEqualTo
-            query.setFilter(namespaceAwareFilterFactory.equals(
-                    featureFidMapping, namespaceAwareFilterFactory.literal(featureId)));
+            query.setFilter(namespaceAwareFilterFactory.equals(featureFidMapping,
+                    namespaceAwareFilterFactory.literal(featureId)));
             matchingFeatures = this.mappedSource.getFeatures(query);
         }
 
@@ -536,45 +678,27 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         curSrcFeature = null;
     }
 
-    private void setNextFeature(String fId, ArrayList<Feature> features) {
-        features.add(curSrcFeature);
-
-        curSrcFeature = null;
-
-        while (sourceFeatureIterator.hasNext()) {
-            Feature next = sourceFeatureIterator.next();
-            // RA: apply filters that involve attributes from nested features here.
-            // Because for JDBCFeatureSource, if the filter is included in the feature source query,
-            // it will try to translate the filter to SQL form, which will fail because the
-            // attributes may come from a different table (for nested feature type).
-            if (extractIdForFeature(next).equals(fId)) {
-                features.add(next);
-            } else {
-                curSrcFeature = next;
-                break;
-            }
-        }
-    }
-
     protected Feature computeNext() throws IOException {
-        if (this.curSrcFeature == null) {
-            LOGGER.warning("hasNext not called before calling next() in the iterator!");
-        }
-
-        ArrayList<Feature> sources = new ArrayList<Feature>();
-        String id = extractIdForFeature(curSrcFeature);
-
-        if (isFiltered) {
-            setNextFilteredFeature(id, sources);
-        } else {
-            setNextFeature(id, sources);
-        }
-
-        if (sources.isEmpty()) {
-            LOGGER.warning("No features found in next()."
+        if (curSrcFeature == null) {
+            throw new UnsupportedOperationException("No features found in next()."
                     + "This wouldn't have happenned if hasNext() was called beforehand.");
         }
-        final AttributeDescriptor targetNode = mapping.getTargetFeature();
+
+        setHasNextCalled(false);
+
+        ArrayList<Feature> sources = new ArrayList<Feature>();
+
+        String id = extractIdForFeature(curSrcFeature);
+
+        if (isDenormalised) {
+            if (isFiltered) {
+                setNextFilteredFeature(id, sources);
+            } else {
+                setNextFeature(id, sources);
+            }
+        } else {
+            sources.add(curSrcFeature);
+        }
         final Name targetNodeName = targetNode.getName();
         final List<AttributeMapping> mappings = mapping.getAttributeMappings();
 
@@ -583,15 +707,10 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         Feature target = (Feature) builder.build(id);
 
         for (AttributeMapping attMapping : mappings) {
-            StepList targetXpathProperty = attMapping.getTargetXPath();
-            if (targetXpathProperty.size() == 1) {
-                Step rootStep = (Step) targetXpathProperty.get(0);
-                QName stepName = rootStep.getName();
-                if (Types.equals(targetNodeName, stepName)) {
-                    // ignore the top level mapping for the Feature itself
-                    // as it was already set
-                    continue;
-                }
+            if (isTopLevelmapping(targetNodeName, attMapping.getTargetXPath())) {
+                // ignore the top level mapping for the Feature itself
+                // as it was already set
+                continue;
             }
             // extract the values from multiple source features of the same id
             // and set them to one built feature
@@ -606,7 +725,78 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         if (target.getDefaultGeometryProperty() == null) {
             setGeometry(target);
         }
+        this.cleanEmptyElements(target);
         return target;
+    }
+
+    private void cleanEmptyElements(Feature target) throws DataSourceException {
+        try {
+            ArrayList values = new ArrayList<Property>();
+            for (Iterator i = target.getValue().iterator(); i.hasNext();) {
+                Property p = (Property) i.next();
+
+                if (hasChild(p)) {
+                    values.add(p);
+                } else if (p.getDescriptor().getMinOccurs() > 0) {
+                    if (!p.getDescriptor().isNillable()) {
+                        throw new IllegalArgumentException(p.getDescriptor().getName()
+                                + " requires a non null value");
+                    } else {
+                        values.add(p);
+                    }
+                }
+            }
+            target.setValue(values);
+        } catch (DataSourceException e) {
+            throw new DataSourceException("Unable to clean empty element", e);
+        }
+    }
+
+    private boolean hasChild(Property p) throws DataSourceException {
+        if (p instanceof Feature) {
+            return true;
+        }
+        boolean result = false;
+        if (p.getValue() instanceof Collection) {
+
+            Collection c = (Collection) p.getValue();
+            // Will need to add && this.getClientProperties(p).get(XLINK_HREF_NAME)!=null if we
+            // intend to skip empty xlink href eg <gsml:samplingFrame/>             
+            if (c.size() == 0 && this.getClientProperties(p).containsKey(XLINK_HREF_NAME)) {
+                return true;
+            }
+
+            ArrayList values = new ArrayList();
+            for (Object o : c) {
+                if (o instanceof Property) {
+                    if (hasChild((Property) o)) {
+                        values.add(o);
+                        result = true;
+                    } else if (((Property) o).getDescriptor().getMinOccurs() > 0) {
+                        if (((Property) o).getDescriptor().isNillable()) {
+                            // add nil mandatory property
+                            values.add(o);
+                        }
+                    }
+                }
+            }
+            p.setValue(values);
+        } else {
+            result = true;
+        }
+        return result;
+
+    }
+
+    private boolean isTopLevelmapping(Name targetNodeName, StepList targetXPath) {
+        if (targetXPath.size() == 1) {
+            Step rootStep = targetXPath.get(0);
+            QName stepName = rootStep.getName();
+            if (Types.equals(targetNodeName, stepName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Feature populateFeatureData(String id) throws IOException {
@@ -640,7 +830,7 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
      *            The xPath matching the attribute
      * @return The first matching attribute
      */
-    private Property getProperty(ComplexAttribute root, StepList xpath) {
+    private Property getProperty(Attribute root, StepList xpath) {
         Property property = root;
 
         final StepList steps = new StepList(xpath);
@@ -712,6 +902,14 @@ public class DataAccessMappingFeatureIterator extends AbstractMappingFeatureIter
         // only care for chained features
         return isNested ? (clientPropsMappings.isEmpty() ? false : (clientPropsMappings
                 .get(XLINK_HREF_NAME) == null) ? false : true) : false;
+    }
+
+    public void flagNextFeature(boolean isSet) {
+        this.isNextFeatureSet = isSet;
+    }
+
+    public boolean isNextFeatureSet() {
+        return isNextFeatureSet;
     }
 
 }

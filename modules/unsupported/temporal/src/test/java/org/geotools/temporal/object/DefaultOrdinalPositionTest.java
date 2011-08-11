@@ -36,7 +36,7 @@ import org.opengis.temporal.TemporalReferenceSystem;
  *
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/object/DefaultOrdinalPositionTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/test/java/org/geotools/temporal/object/DefaultOrdinalPositionTest.java $
  */
 public class DefaultOrdinalPositionTest {
 

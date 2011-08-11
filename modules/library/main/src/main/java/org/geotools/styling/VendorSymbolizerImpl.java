@@ -32,12 +32,8 @@ import org.opengis.style.StyleVisitor;
  * 
  * @author James Macgill, CCG
  * @author Johann Sorel (Geomatys)
-<<<<<<< local
- * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/PolygonSymbolizerImpl.java $
-=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/main/java/org/geotools/styling/VendorSymbolizerImpl.java $
->>>>>>> other
  * @version $Id: PolygonSymbolizerImpl.java 33833 2009-09-04 12:26:28Z jive $
  */
 public class VendorSymbolizerImpl extends AbstractSymbolizer implements ExtensionSymbolizer {

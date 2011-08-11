@@ -30,7 +30,7 @@ import org.opengis.filter.Filter;
  * contains a Sequence of Attributes.
  * 
  * @author dzwiers
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/FeatureAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/type/FeatureAttributeType.java $
  */
 public class FeatureAttributeType extends AttributeDescriptorImpl implements AttributeType {
 

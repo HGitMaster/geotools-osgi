@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
 
@@ -175,19 +175,24 @@
   <dependencies>
     <!-- NOTE: The referencing module does not depends on JTS. -->
     <dependency>
-      <groupId>java3d</groupId>
-      <artifactId>vecmath</artifactId>
+      <groupId>java3d.osgi</groupId>
+      <artifactId>java3d.osgi.vecmath</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.pool</artifactId>  
+      <version>1.4.0</version>     
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-metadata</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
 
     <!-- Test dependencies -->
@@ -197,14 +202,61 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <!-- Required for ImageParameterDescriptor test. -->
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>test</scope>
-    </dependency>
   </dependencies>
+  
+  <build>
+      <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/WarpTransformTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                  <manifest>
+                     <addClasspath>false</addClasspath>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+<plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration> 
+          <attach>true</attach>                 
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>${groupId}.referencing.source
+              </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                ${groupId}.referencing;version="${version}";roots:="."
+              </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      </plugins>
+   </build>
 
 
 </project>

@@ -58,7 +58,7 @@ import org.geotools.data.wms.request.GetMapRequest;
  * 
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/WMSLab2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/WMSLab2.java $
  */
 public class WMSLab2 extends JFrame {
     private static final long serialVersionUID = -3039255518595806472L;

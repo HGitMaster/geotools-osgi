@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * This is sometime useful for testing purpose.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/NullImageWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/NullImageWriter.java $
  * @version $Id: NullImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */
@@ -67,7 +67,7 @@ public class NullImageWriter extends GeographicImageWriter {
      * Service provider interface (SPI) for {@link NullImageWriter}s.
      *
      * @since 2.5
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/NullImageWriter.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/NullImageWriter.java $
      * @version $Id: NullImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
      * @author Martin Desruisseaux
      */

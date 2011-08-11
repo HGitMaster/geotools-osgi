@@ -29,6 +29,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import org.opengis.feature.IllegalAttributeException;
+import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
 import org.geotools.feature.type.AttributeTypeImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
@@ -40,6 +41,7 @@ import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.PropertyType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * This is a set of utility methods used when <b>implementing</b> types.
@@ -53,7 +55,7 @@ import org.opengis.filter.identity.Identifier;
  * @author Jody Garnett, Refractions Research
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/Types.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/Types.java $
  */
 public class Types {
 
@@ -698,6 +700,10 @@ public class Types {
     }
 
     public static QName toQName(Name featurePath) {
+        return toQName(featurePath, null);
+    }
+
+    public static QName toQName(Name featurePath, NamespaceSupport ns) {
         if (featurePath == null) {
             return null;
         }
@@ -707,6 +713,13 @@ public class Types {
         if (null == namespace) {
             qName = new QName(localName);
         } else {
+            if (ns != null) {
+                String prefix = ns.getPrefix(namespace);
+                if (prefix != null) {
+                    qName = new QName(namespace, localName, prefix);
+                    return qName;
+                }
+            }
             qName = new QName(namespace, localName);
         }
         return qName;
@@ -750,6 +763,55 @@ public class Types {
 
         return name.getNamespaceURI().equals(qName.getNamespaceURI())
                 && name.getLocalPart().equals(qName.getLocalPart());
+    }
+    
+
+
+    /**
+     * Takes a prefixed attribute name and returns an {@link Name} by looking which namespace
+     * belongs the prefix to in {@link AppSchemaDataAccessDTO#getNamespaces()}.
+     * 
+     * @param prefixedName
+     *            , namespaces
+     * @return
+     * @throws IllegalArgumentException
+	 *             if <code>prefixedName</code> has no declared namespace in
+	 *             app-schema config file.
+	 */	
+    public static Name degloseName(String prefixedName, NamespaceSupport namespaces)
+            throws IllegalArgumentException {
+        Name name = null;
+
+        if (prefixedName == null) {
+            return null;
+        }
+
+        int prefixIdx = prefixedName.indexOf(':');
+        if (prefixIdx == -1) {
+            return Types.typeName(prefixedName);
+            // throw new IllegalArgumentException(prefixedName + " is not
+            // prefixed");
+        }
+
+        String nsPrefix = prefixedName.substring(0, prefixIdx);
+        String localName = prefixedName.substring(prefixIdx + 1);
+        String nsUri = namespaces.getURI(nsPrefix);
+        
+        // handles undeclared namespaces in the app-schema mapping file
+		if (nsUri == null) {
+			throw new IllegalArgumentException(
+					"No namespace set: The namespace has not"
+							+ " been declared in the app-schema mapping file for name: "
+							+ nsPrefix
+							+ ":"
+							+ localName
+							+ " [Check the Namespaces section in the config file] ");
+
+		}
+        
+        name = Types.typeName(nsUri, localName);
+
+        return name;
     }
 
     // /** Wander up getSuper gathering all memberTypes */

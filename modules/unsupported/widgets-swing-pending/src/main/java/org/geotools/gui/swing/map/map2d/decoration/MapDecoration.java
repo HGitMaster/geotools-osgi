@@ -27,7 +27,7 @@ import org.geotools.gui.swing.map.map2d.Map2D;
  *
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/decoration/MapDecoration.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/decoration/MapDecoration.java $
  */
 public interface MapDecoration {
 

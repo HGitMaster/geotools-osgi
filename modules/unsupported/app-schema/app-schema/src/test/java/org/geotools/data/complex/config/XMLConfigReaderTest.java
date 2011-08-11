@@ -27,7 +27,7 @@ import org.geotools.data.complex.FeatureTypeMapping;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: XMLConfigReaderTest.java 33431 2009-07-02 04:48:06Z robatkinson $
+ * @version $Id: XMLConfigReaderTest.java 35958 2010-07-28 08:20:20Z victortey $
  * @source $URL:
  *         http://svn.geotools.org/trunk/modules/unsupported/community-schemas/community-schema-ds/src/test/java/org/geotools/data/complex/config/XMLConfigReaderTest.java $
  * @since 2.4
@@ -56,7 +56,7 @@ public class XMLConfigReaderTest extends TestCase {
         assertEquals(1, mappings.size());
         FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator().next();
 
-        assertEquals(7, mapping.getAttributeMappings().size());
+        assertEquals(8, mapping.getAttributeMappings().size());
         assertNotNull(mapping.getTargetFeature());
         assertNotNull(mapping.getSource());
 

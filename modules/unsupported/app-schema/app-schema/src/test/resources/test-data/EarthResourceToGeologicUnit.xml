@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
                       http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
 	<!-- 
-        Mapping file for gsml:GeologicUnit where a data access containing mo:EarthResource is
+        Mapping file for gsml:GeologicUnit where a data access containing er:EarthResource is
         used. The complex features from the input data access is re-mapped to gsml:features.
     -->
 	<namespaces>
@@ -15,13 +15,17 @@
 		</Namespace>
 		<Namespace>
 			<prefix>gsml</prefix>
-			<uri>http://www.cgi-iugs.org/xml/GeoSciML/2</uri>
+			<uri>urn:cgi:xmlns:CGI:GeoSciML:2.0</uri>
 		</Namespace>
 		<Namespace>
-			<prefix>mo</prefix>
-			<uri>urn:cgi:xmlns:GGIC:MineralOccurrence:1.0</uri>
+			<prefix>er</prefix>
+			<uri>urn:cgi:xmlns:GGIC:EarthResource:1.1</uri>
 		</Namespace>
 	</namespaces>
+	<includedTypes>
+        <Include>CompositionPart.xml</Include>
+        <Include>CGITermValue.xml</Include>
+    </includedTypes>	
 	<sourceDataStores>
 		<DataStore>
 			<id>EarthResource</id>
@@ -39,14 +43,14 @@
 			<isDataAccess>true</isDataAccess>
 		</DataStore>
 	</sourceDataStores>
-	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd</schemaUri>
+			<schemaUri>http://www.geosciml.org/geosciml/2.0/xsd/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>
 		<FeatureTypeMapping>
+		    <mappingName>myGeologicUnit</mappingName>
 			<sourceDataStore>EarthResource</sourceDataStore>
 			<sourceType>EarthResource</sourceType>
 			<targetElement>gsml:GeologicUnit</targetElement>
@@ -83,17 +87,7 @@
 					        This input XPath expression from the input complex feature is 
 					        mapped to the output XPath expression of a different XML form.
 					      -->
-						<inputAttribute>mo:form</inputAttribute>
-					</sourceExpression>
-				</AttributeMapping>
-				<AttributeMapping>
-					<targetAttribute>gsml:classifier</targetAttribute>
-					<targetAttributeNode>gsml:ControlledConceptPropertyType</targetAttributeNode>
-				</AttributeMapping>
-				<AttributeMapping>
-					<targetAttribute>gsml:classifier/gsml:ControlledConcept/gml:name</targetAttribute>
-					<sourceExpression>
-						<inputAttribute>mo:classification/mo:MineralDepositModel/mo:mineralDepositGroup</inputAttribute>
+						<inputAttribute>er:form</inputAttribute>
 					</sourceExpression>
 				</AttributeMapping>
 				<AttributeMapping>
@@ -101,7 +95,7 @@
 			            gsml:composition
 		            </targetAttribute>
 					<sourceExpression>
-						<inputAttribute>mo:composition</inputAttribute>
+						<inputAttribute>er:composition</inputAttribute>
 						<linkElement>gsml:CompositionPart</linkElement>
 						<linkField>FEATURE_LINK</linkField>
 					</sourceExpression>
@@ -109,10 +103,10 @@
 				</AttributeMapping>
 				<AttributeMapping>
 					<targetAttribute>
-		                gsml:occurence
+		                gsml:occurrence
 		            </targetAttribute>
 					<sourceExpression>
-						<inputAttribute>mo:commodityDescription</inputAttribute>
+						<inputAttribute>er:commodityDescription</inputAttribute>
 						<linkElement>gsml:MappedFeature</linkElement>
 						<linkField>gml:name[2]</linkField>
 					</sourceExpression>

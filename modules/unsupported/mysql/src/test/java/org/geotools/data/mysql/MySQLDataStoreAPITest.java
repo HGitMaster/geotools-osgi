@@ -96,7 +96,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreAPITest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/test/java/org/geotools/data/mysql/MySQLDataStoreAPITest.java $
  */
 public class MySQLDataStoreAPITest extends DataTestCase {
     private static final int LOCK_DURATION = 3600 * 1000; // one hour

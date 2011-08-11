@@ -25,7 +25,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author Cory Horner, Refractions
  *
  * @since 2.2.M2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/feature/visitor/FeatureVisitor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/feature/visitor/FeatureVisitor.java $
  * @deprecated use {@link org.opengis.feature.FeatureVisitor}.
  */
 public interface FeatureVisitor extends org.opengis.feature.FeatureVisitor {

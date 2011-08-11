@@ -81,7 +81,7 @@ import org.geotools.image.io.metadata.GeographicMetadata;
  * {@code TextRecordImageReader}, unless you want more control on the decoding process.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextRecordImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextRecordImageReader.java $
  * @version $Id: TextRecordImageReader.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  */
@@ -643,7 +643,7 @@ public class TextRecordImageReader extends TextImageReader {
      * and {@code Spi}.
      *
      * @since 2.1
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextRecordImageReader.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextRecordImageReader.java $
      * @version $Id: TextRecordImageReader.java 30965 2008-07-09 10:04:21Z cedricbr $
      * @author Martin Desruisseaux (IRD)
      */

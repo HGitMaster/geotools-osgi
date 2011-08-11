@@ -39,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * Builds sql for postgis.
  *
  * @author Chris Holmes
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisSQLBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisSQLBuilder.java $
  */
 public class PostgisSQLBuilder extends DefaultSQLBuilder {
     /** If true, WKB format is used instead of WKT */

@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * keeps everything.
  * </p>
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/QuickOracleOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/QuickOracleOnlineTest.java $
  */
 public class QuickOracleOnlineTest extends DataTestCase {
     

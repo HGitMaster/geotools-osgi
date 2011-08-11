@@ -33,7 +33,7 @@ import java.awt.geom.AffineTransform;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/strategy/StreamingStrategy.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/strategy/StreamingStrategy.java $
  */
 public interface StreamingStrategy {
     

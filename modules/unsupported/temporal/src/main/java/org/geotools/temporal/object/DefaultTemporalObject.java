@@ -23,7 +23,7 @@ import org.opengis.temporal.TemporalObject;
  * 
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalObject.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/DefaultTemporalObject.java $
  */
 public abstract class DefaultTemporalObject implements TemporalObject {
 }

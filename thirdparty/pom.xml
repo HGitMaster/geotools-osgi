@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!--
+    =======================================================================
+    Maven Project Configuration File The Geotools Project
+    http://www.geotools.org/
+    =======================================================================
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>geotools</artifactId>
+    <version>8.0.0.M1osgi1</version>
+  </parent>
+
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>thirdparty</artifactId>
+  <version>8.0.0.M1osgi1</version>
+  <packaging>pom</packaging>
+  <name>Geotools thirdparty libs</name>
+  <description>
+    Geotools third-party libraries, required for building and
+    running Geotools.
+  </description>
+
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+    <module>de.berlios.com.miglayout</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.customstreams</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>    
+    <module>de.berlios.org.apache.commons.cli2</module>
+    <module>javax.media.jai.osgi</module>
+    <module>javax.media.jai.osgi.linux.x86_64</module>
+    <module>javax.media.jai.osgi.win32.x86</module>
+    <module>javax.media.jai.osgi.imageio</module>
+    <module>javax.media.jai.osgi.imageio.linux.x86_64</module>
+    <module>java3d.osgi</module>
+    <module>com.vividsolutions.osgi.jts</module>
+    <module>org.jaitools.osgi.jt-utils</module>
+    <module>org.jaitools.osgi.jt-zonalstats</module>
+    <module>org.apache.batik.osgi.transcoder</module>
+    <module>com.springsource.org.apache.batik.dom</module>
+    <module>com.springsource.org.apache.batik.dom.svg</module>
+    <module>com.springsource.org.apache.batik.util</module>
+    <module>com.springsource.org.apache.commons.lang</module>
+    <module>com.springsource.org.apache.commons.logging</module>
+    <module>com.springsource.org.apache.commons.pool</module>
+    <module>com.springsource.org.apache.log4j</module>
+    <module>com.springsource.org.jdom</module>
+    <module>com.springsource.com.lowagie.text</module>
+    <module>com.springsource.org.apache.bcel</module>
+    <module>com.springsource.org.apache.commons.collections</module>
+    <module>com.springsource.org.apache.commons.beanutils</module>
+    <module>com.springsource.org.apache.regexp</module>
+    <module>com.springsource.org.apache.xalan</module>
+    <module>com.springsource.org.apache.xerces</module>
+    <module>com.springsource.org.apache.xml.resolver</module>
+    <module>com.springsource.org.apache.xmlcommons</module>
+    <module>com.springsource.org.picocontainer</module>
+    <module>com.springsource.org.apache.batik.anim</module>
+    <module>com.springsource.org.apache.batik.bridge</module>
+    <module>com.springsource.org.apache.batik.css</module>
+    <module>com.springsource.org.apache.batik.ext.awt</module>
+    <module>com.springsource.org.apache.batik.gvt</module>
+    <module>com.springsource.org.apache.batik.parser</module>
+    <module>com.springsource.org.apache.batik.script</module>
+    <module>com.springsource.org.apache.batik.svggen</module>
+    <module>com.springsource.org.apache.batik.xml</module>
+    <module>com.springsource.org.junit</module>
+    <module>com.springsource.org.hamcrest.core</module>
+    <module>de.berlios.com.google.google-collections</module>
+  </modules>
+</project>

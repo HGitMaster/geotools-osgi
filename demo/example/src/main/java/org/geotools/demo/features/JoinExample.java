@@ -35,7 +35,7 @@ import org.geotools.swing.data.JFileDataStoreChooser;
  * @author Jody
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/features/JoinExample.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/features/JoinExample.java $
  */
 public class JoinExample {
 

@@ -25,7 +25,7 @@ import javax.swing.JPanel;
  * 
  * @author Jody, gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JPage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JPage.java $
  */
 public abstract class JPage {
     /**

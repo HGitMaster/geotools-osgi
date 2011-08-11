@@ -26,7 +26,7 @@ import org.geotools.util.logging.Logging;
  * An iterator over the tiles at a given level. This iterator continue automatically to tiles
  * at finer levels once the iterator on the level given at construction time is done.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/GridTileIterator.java $
  * @version $Id: GridTileIterator.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

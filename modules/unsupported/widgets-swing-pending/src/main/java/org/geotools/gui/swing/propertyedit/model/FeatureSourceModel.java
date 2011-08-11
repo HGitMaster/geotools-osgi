@@ -47,7 +47,7 @@ import org.opengis.filter.FilterFactory;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/FeatureSourceModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/FeatureSourceModel.java $
  */
 public class FeatureSourceModel implements TableModel {
 

@@ -66,7 +66,7 @@ import org.geotools.data.DataStoreFinder;
  * @author Gabriel Roldan, Axios Engineering
  * @version $id$
  * @since 2.3.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/sql-datastore/src/org/geotools/data/sql/SqlDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/sql-datastore/src/org/geotools/data/sql/SqlDataStoreFactory.java $
  */
 public class SqlDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(SqlDataStore.class.getPackage().getName());

@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  *
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/geometry/jts/GeometriesTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/test/java/org/geotools/geometry/jts/GeometriesTest.java $
  * @version $Id: GeometriesTest.java 34588 2009-12-01 13:58:21Z jdeolive $
  */
 public class GeometriesTest {

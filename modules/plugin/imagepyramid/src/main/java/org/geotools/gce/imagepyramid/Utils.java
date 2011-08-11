@@ -32,6 +32,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.geotools.data.DataUtilities;
@@ -128,6 +130,8 @@ class Utils {
         // own sub directory
         File zeroLevelDirectory = new File(directory, "0");
         IOFileFilter directoryFilter = FileFilterUtils.directoryFileFilter();
+        directoryFilter=FileFilterUtils.makeSVNAware(directoryFilter);
+        directoryFilter=FileFilterUtils.makeCVSAware(directoryFilter);
         File[] numericDirectories = directory.listFiles(new NumericDirectoryFilter());
         File[] directories = directory.listFiles((FileFilter) directoryFilter);
         
@@ -166,7 +170,8 @@ class Utils {
         // sort the mosaics by resolution and check they are actually in ascending resolution order
         // for both X and Y resolutions
         Collections.sort(mosaics);
-        for(int i = 1; i < mosaics.size(); i++) {
+        final int size=mosaics.size();
+        for(int i = 1; i < size; i++) {
             double[] resprev = mosaics.get(i - 1).getResolutions();
             double[] res = mosaics.get(i).getResolutions();
             if(resprev[1] > res[1]) {
@@ -217,15 +222,26 @@ class Utils {
         if(envelope.getCoordinateReferenceSystem() != null) {
             File prjFile = new File(directory, directory.getName() + ".prj");
             PrintWriter pw = null;
+            FileOutputStream fo=null;
             try {
-                pw = new PrintWriter(new FileOutputStream(prjFile));
+            	fo=new FileOutputStream(prjFile);
+                pw = new PrintWriter(fo);
                 pw.print(envelope.getCoordinateReferenceSystem().toString());
             } catch(IOException e) {
                 LOGGER.log(Level.INFO, "We could not write out the projection file " + 
                         prjFile.getPath(), e);
                 return null;
             } finally {
-                pw.close();
+            	if(pw!=null)
+            		IOUtils.closeQuietly(pw);
+
+            	if(fo!=null)
+            		IOUtils.closeQuietly(fo);
+            	
+            	// release mosaics
+				for (MosaicInfo mosaic : mosaics) {
+					mosaic.reader.dispose();
+				}
             }
         }
         

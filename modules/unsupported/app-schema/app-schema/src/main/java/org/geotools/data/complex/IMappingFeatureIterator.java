@@ -25,7 +25,7 @@ import org.opengis.feature.Feature;
 /**
  * @author Russell Petty, GSV
  * @version $Id: IMappingFeatureIterator.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/IMappingFeatureIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/IMappingFeatureIterator.java $
  */
 public interface IMappingFeatureIterator extends Iterator<Feature>, FeatureIterator<Feature> {
 

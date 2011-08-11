@@ -34,7 +34,7 @@ import javax.measure.unit.Unit;
  * graduation for numbers.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/Graduation.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/Graduation.java $
  * @version $Id: Graduation.java 30760 2008-06-18 14:28:24Z desruisseaux $
  * @author Martin Desruisseaux (PMO, IRD)
  */

@@ -19,7 +19,6 @@ package org.geotools.data.complex;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,8 +45,8 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccessFactory.java 33774 2009-08-20 08:46:45Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
+ * @version $Id: AppSchemaDataAccessFactory.java 35182 2010-04-07 06:58:28Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccessFactory.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessFactory implements DataAccessFactory {
@@ -94,8 +93,6 @@ public class AppSchemaDataAccessFactory implements DataAccessFactory {
         mappings = AppSchemaDataAccessConfigurator.buildMappings(config);
 
         dataStore = new AppSchemaDataAccess(mappings);
-
-        dataStore.register();
 
         return dataStore;
     }

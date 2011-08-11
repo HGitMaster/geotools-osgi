@@ -37,7 +37,7 @@ import org.geotools.referencing.wkt.UnformattableObjectException;
  *
  * @since 2.3
  * @version $Id: PropertiesSheet.java 30655 2008-06-12 20:24:25Z acuster $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/PropertiesSheet.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/referencing/PropertiesSheet.java $
  * @author Martin Desruisseaux (IRD)
  */
 @SuppressWarnings("serial")

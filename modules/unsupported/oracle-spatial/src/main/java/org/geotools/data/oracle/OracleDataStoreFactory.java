@@ -39,7 +39,7 @@ import org.geotools.data.jdbc.datasource.ManageableDataSource;
  *
  * @author Jody Garnett, Refractions Research
  * @author Sean Geoghegan, Defence Science and Technology Organisation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/main/java/org/geotools/data/oracle/OracleDataStoreFactory.java $
  */
 public class OracleDataStoreFactory implements DataStoreFactorySpi {
 	private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geotools.data.oracle");     

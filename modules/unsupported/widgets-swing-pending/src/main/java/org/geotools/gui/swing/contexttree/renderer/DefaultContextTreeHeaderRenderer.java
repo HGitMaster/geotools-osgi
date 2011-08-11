@@ -29,7 +29,7 @@ import org.jdesktop.swingx.table.ColumnHeaderRenderer;
  *
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/DefaultContextTreeHeaderRenderer.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/DefaultContextTreeHeaderRenderer.java $
  */
 public class DefaultContextTreeHeaderRenderer extends ColumnHeaderRenderer{
 

@@ -53,7 +53,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Leprosy
  * @since 0.3
  * TODO: test wkt geometry parse.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/GeometricAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/type/GeometricAttributeType.java $
  * 
  * @deprecated use {@link GeometryTypeImpl}.
  *

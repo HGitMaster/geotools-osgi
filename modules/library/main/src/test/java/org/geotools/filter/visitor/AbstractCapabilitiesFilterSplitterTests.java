@@ -28,10 +28,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.filter.Capabilities;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.FilterFunction_geometryType;
-<<<<<<< local
-import org.geotools.filter.visitor.ClientTransactionAccessor;
-=======
->>>>>>> other
+
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Id;
@@ -56,11 +53,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author Jesse
  * @author ported from PostPreProcessFilterSplittingVisitor at 2.5.2 by Gabriel Roldan
-<<<<<<< local
-=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/filter/visitor/AbstractCapabilitiesFilterSplitterTests.java $
->>>>>>> other
  */
 @SuppressWarnings("nls")
 public class AbstractCapabilitiesFilterSplitterTests {

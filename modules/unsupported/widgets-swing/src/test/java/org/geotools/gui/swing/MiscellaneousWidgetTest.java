@@ -53,7 +53,7 @@ import org.geotools.gui.swing.image.ColorRamp;
  * Tests a set of widgets. Widgets will be displayed only if the test is run from the main
  * method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/MiscellaneousWidgetTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/MiscellaneousWidgetTest.java $
  * @version $Id: MiscellaneousWidgetTest.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

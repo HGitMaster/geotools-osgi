@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.geotools</groupId>
 		<artifactId>arcsde-plugin</artifactId>
-		<version>8.0-M1</version>
+		<version>8.0.0.M1osgi1</version>
 	</parent>
 
 
@@ -127,20 +127,13 @@
       <scope>provided</scope>
     </dependency>		
     <dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_codec</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_imageio</artifactId>
-			<scope>provided</scope>
-		</dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.media.jai.osgi</groupId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-sample-data</artifactId>

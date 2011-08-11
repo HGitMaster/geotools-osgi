@@ -45,7 +45,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * Tests {@link FeatureTableModel}. The table will be shown only if the test is run from the
  * main method. Otherwise (i.e. if run from Maven), widgets are invisibles.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/FeatureTableModelTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/test/java/org/geotools/gui/swing/FeatureTableModelTest.java $
  * @version $Id: FeatureTableModelTest.java 30655 2008-06-12 20:24:25Z acuster $
  * @author James Macgill, CCG
  */

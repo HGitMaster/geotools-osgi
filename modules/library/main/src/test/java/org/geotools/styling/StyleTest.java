@@ -1,13 +1,9 @@
 package org.geotools.styling;
 
-<<<<<<< local
-import static org.junit.Assert.*;
-=======
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
->>>>>>> other
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +29,8 @@ import org.opengis.style.StyleVisitor;
  * instances.
  * </ul>
  *
-<<<<<<< local
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/test/java/org/geotools/styling/StyleTest.java $
-=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/tags/8.0-M1/modules/library/main/src/test/java/org/geotools/styling/StyleTest.java $
->>>>>>> other
  */
 public class StyleTest {
     static FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2(null);

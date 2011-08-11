@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Tests {@link GridTileManager}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/GridTileManagerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/GridTileManagerTest.java $
  * @version $Id: GridTileManagerTest.java 30725 2008-06-13 19:29:06Z desruisseaux $
  * @author Martin Desruisseaux
  */

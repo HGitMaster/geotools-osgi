@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * Exercise DB2CoordinateSystem.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2CoordinateSystemOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2CoordinateSystemOnlineTest.java $
  */
 public class DB2CoordinateSystemOnlineTest extends AbstractDB2OnlineTestCase {
     private Connection conn;
@@ -35,8 +35,8 @@ public class DB2CoordinateSystemOnlineTest extends AbstractDB2OnlineTestCase {
      *
      * @throws Exception
      */
-    public void setUp() throws Exception {
-        super.setUp();
+    public void connect() throws Exception {
+        super.connect();
         conn = getConnection();
     }
 
@@ -45,9 +45,9 @@ public class DB2CoordinateSystemOnlineTest extends AbstractDB2OnlineTestCase {
      *
      * @throws Exception
      */
-    protected void tearDown() throws Exception {
+    protected void disconnect() throws Exception {
         conn.close();
-        super.tearDown();
+        super.disconnect();
     }
 
     public void testCreate() {

@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * </p>
  *
  * @author jgarnett
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/TempMemoryDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/TempMemoryDataStore.java $
  */
 public class TempMemoryDataStore extends AbstractDataStore {
 

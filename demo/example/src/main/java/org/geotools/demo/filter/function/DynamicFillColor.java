@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Michael Bedward
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/filter/function/DynamicFillColor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/filter/function/DynamicFillColor.java $
  */
 public class DynamicFillColor {
 

@@ -24,7 +24,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  * @author Russell Petty, GSV
  * @version $Id: FeatureTypeMappingFactory.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMappingFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/FeatureTypeMappingFactory.java $
  */
 public class FeatureTypeMappingFactory {
 

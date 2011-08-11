@@ -24,7 +24,7 @@ import javax.swing.border.EmptyBorder;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/RenderAndEditComponent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/RenderAndEditComponent.java $
  */
 public abstract class RenderAndEditComponent extends javax.swing.JPanel {
 

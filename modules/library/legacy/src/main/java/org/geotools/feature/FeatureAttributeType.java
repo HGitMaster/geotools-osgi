@@ -42,7 +42,7 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research, Inc.
  *
  * @since 2.1.M5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/FeatureAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/FeatureAttributeType.java $
  */
 public interface FeatureAttributeType extends AttributeType, PrimativeAttributeType {
     /**

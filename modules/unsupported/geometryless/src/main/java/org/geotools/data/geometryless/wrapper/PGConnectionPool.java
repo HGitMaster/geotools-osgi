@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * 
  * @author Rob Atkinson rob@socialchange.net.NOSPAM.au
  * @author Peter Barrs@socialchange.net.NOSPAM.au
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/wrapper/PGConnectionPool.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/wrapper/PGConnectionPool.java $
  */
 public class PGConnectionPool extends org.postgresql.jdbc2.optional.ConnectionPool { 
 	

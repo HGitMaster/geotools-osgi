@@ -21,29 +21,10 @@ package org.geotools.data.db2;
  * Exercise DB2DataStore.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2DataStoreOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2DataStoreOnlineTest.java $
  */
 public class DB2DataStoreOnlineTest extends AbstractDB2OnlineTestCase {
-    /**
-     * Setup gets a database connection that will be live for the duration of
-     * all tests.
-     *
-     * @throws Exception
-     */
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    /**
-     * Closes the database connection before we terminate.
-     *
-     * @throws Exception
-     */
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testTableSchema() throws Exception {
+       public void testTableSchema() throws Exception {
     	String tableSchema = getDataStore().getTableSchema();
         assertEquals(tableSchema, "Test");
     }

@@ -57,7 +57,7 @@ import org.opengis.util.ProgressListener;
 
 /**
  * @since 2.2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureCollection.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureCollection.java $
  * 
  * @deprecated scheduled for removal in 2.7, use classes in org.geotools.jdbc
  */

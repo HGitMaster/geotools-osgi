@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>library</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
 
@@ -98,39 +98,85 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.logging</artifactId>
+    </dependency>
   </dependencies>
 
 
   <!-- ==================================================== -->
   <!--     Compilation (including non-standard plugins)     -->
   <!-- ==================================================== -->
-  <build>
-    <plugins>
- 
-      <plugin>
-        <groupId>org.geotools.maven</groupId>
-        <artifactId>jjtree-javacc</artifactId>
-        <version>${project.version}</version>
-			
-    		<configuration>
-         		<nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
-     			<nodeDirectory>${basedir}/modified-src</nodeDirectory>
-     			<sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
-    		</configuration>
+   <build>
+      <plugins>
 
+         <plugin>
+            <groupId>org.geotools.maven</groupId>
+            <artifactId>jjtree-javacc</artifactId>
+            <version>${project.version}</version>
+
+            <configuration>
+               <nodePackage>org.geotools.filter.text.generated.parsers</nodePackage>
+               <nodeDirectory>${basedir}/modified-src</nodeDirectory>
+               <sourceDirectory>${basedir}/src/main/jjtree</sourceDirectory>
+            </configuration>
+
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+
+               </execution>
+
+            </executions>
+
+         </plugin>
+
+         <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                  <manifest>
+                     <addClasspath>false</addClasspath>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
         <executions>
           <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
             <goals>
-              <goal>generate</goal>
+              <goal>jar-no-fork</goal>
             </goals>
-
           </execution>
-          
         </executions>
+        <configuration> 
+          <attach>true</attach>                 
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>${groupId}.cql.source
+              </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                ${groupId}.cql;version="${version}";roots:="."
+              </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      </plugins>
 
-      </plugin>     
-	</plugins>
-
-  </build>
+   </build>
 
 </project>

@@ -25,7 +25,7 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
  * 
  * @deprecated Please use IdFinderFilterVisitor
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/renderer/lite/FIDFilterFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/renderer/lite/FIDFilterFinder.java $
  */
 public class FIDFilterFinder extends AbstractFilterVisitor implements FilterVisitor {
 	

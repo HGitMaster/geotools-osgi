@@ -44,7 +44,7 @@ import org.opengis.feature.type.Name;
  * 
  * @author gdavis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ProcessSelectionPage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ProcessSelectionPage.java $
  */
 public class ProcessSelectionPage extends JPage {
     Map<String, Object> input;

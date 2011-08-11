@@ -88,7 +88,7 @@ import com.vividsolutions.jts.io.WKTWriter;
  *
  * @author Adrian Custer
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/libraryJTS/src/main/java/org/geotools/demo/libraryJTS/DemoJTS.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/libraryJTS/src/main/java/org/geotools/demo/libraryJTS/DemoJTS.java $
  * @version 0.0.1   April 2006
  *
  */

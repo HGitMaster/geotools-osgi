@@ -64,7 +64,7 @@ import org.opengis.util.InternationalString;
  * <p>&nbsp;</p>
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/ProgressWindow.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/ProgressWindow.java $
  * @version $Id: ProgressWindow.java 34133 2009-10-12 08:14:05Z mbedward $
  * @author Martin Desruisseaux (PMO, IRD)
  */

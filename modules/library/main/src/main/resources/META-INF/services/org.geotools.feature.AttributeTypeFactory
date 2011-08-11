@@ -1,4 +1,1 @@
-<<<<<<< local
-org.geotools.feature.DefaultAttributeTypeFactory=======
 org.geotools.feature.DefaultAttributeTypeFactory
->>>>>>> other

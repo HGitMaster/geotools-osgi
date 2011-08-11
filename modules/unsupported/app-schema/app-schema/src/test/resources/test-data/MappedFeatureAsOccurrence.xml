@@ -4,10 +4,8 @@
     This is to avoid circular reference problem when this is linked as gsml:occurrence in Geologic Unit type.
  -->
 <as:AppSchemaDataAccess xmlns:as="http://www.geotools.org/app-schema"
-	xmlns:ogc="http://www.opengis.net/ogc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd
-                      http://www.opengis.net/ogc http://schemas.opengis.net/filter/1.1.0/expr.xsd">
+	xsi:schemaLocation="http://www.geotools.org/app-schema AppSchemaDataAccess.xsd">
 	<namespaces>
 		<Namespace>
 			<prefix>gml</prefix>
@@ -15,7 +13,7 @@
 		</Namespace>
 		<Namespace>
 			<prefix>gsml</prefix>
-			<uri>http://www.cgi-iugs.org/xml/GeoSciML/2</uri>
+			<uri>urn:cgi:xmlns:CGI:GeoSciML:2.0</uri>
 		</Namespace>
 	</namespaces>
 	<sourceDataStores>
@@ -30,10 +28,9 @@
 			</parameters>
 		</DataStore>
 	</sourceDataStores>
-	<catalog>mappedPolygons.oasis.xml</catalog>
 	<targetTypes>
 		<FeatureType>
-			<schemaUri>http://schemas.opengis.net/GeoSciML/geosciml.xsd </schemaUri>
+			<schemaUri>http://www.geosciml.org/geosciml/2.0/xsd/geosciml.xsd</schemaUri>
 		</FeatureType>
 	</targetTypes>
 	<typeMappings>

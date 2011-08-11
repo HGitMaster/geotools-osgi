@@ -51,7 +51,7 @@ import javax.imageio.ImageWriteParam;
  * written.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicController.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicController.java $
  * @version $Id: MosaicController.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Martin Desruisseaux
  */

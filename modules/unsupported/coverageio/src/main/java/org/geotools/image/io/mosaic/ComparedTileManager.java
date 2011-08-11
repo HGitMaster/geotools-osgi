@@ -37,7 +37,7 @@ import org.geotools.coverage.grid.ImageGeometry;
  * failures throw {@link AssertionError}.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ComparedTileManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/ComparedTileManager.java $
  * @version $Id: ComparedTileManager.java 30742 2008-06-16 19:48:45Z desruisseaux $
  * @author Martin Desruisseaux
  */

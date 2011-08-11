@@ -30,7 +30,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Formats the filename of tiles to be created by {@link MosaicBuilder}.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/FilenameFormatter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/FilenameFormatter.java $
  * @version $Id: FilenameFormatter.java 30729 2008-06-16 09:26:48Z desruisseaux $
  * @author Cédric Briançon
  * @author Martin Desruisseaux

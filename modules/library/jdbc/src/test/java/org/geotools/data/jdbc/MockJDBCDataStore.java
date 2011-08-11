@@ -32,7 +32,7 @@ import org.opengis.feature.type.AttributeDescriptor;
 /** Provides a Mock JDBC DataStore for testing the abstract DataStore implementation.
  * 
  *  @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/MockJDBCDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/test/java/org/geotools/data/jdbc/MockJDBCDataStore.java $
  */
 public class MockJDBCDataStore extends JDBCDataStore {
 	

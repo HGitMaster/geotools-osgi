@@ -30,7 +30,7 @@ import org.jdesktop.swingx.JXTitledSeparator;
  * @author Johann Sorel
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/TitledSeparatorItem.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/popup/TitledSeparatorItem.java $
  */
 public abstract class TitledSeparatorItem extends JXTitledSeparator implements TreePopupItem{
        

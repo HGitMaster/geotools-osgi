@@ -38,7 +38,7 @@ import org.opengis.referencing.datum.Datum;
 /**
  * Tests the {@link MetadataReader} implementation.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/coverage/io/MetadataReaderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/coverage/io/MetadataReaderTest.java $
  * @version $Id: MetadataReaderTest.java 30972 2008-07-09 15:39:01Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  * @author Cédric Briançon

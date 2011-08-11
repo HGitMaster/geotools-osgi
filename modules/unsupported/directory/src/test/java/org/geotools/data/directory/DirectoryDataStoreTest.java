@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Andrea Aime - OpenGeo
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/test/java/org/geotools/data/directory/DirectoryDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/directory/src/test/java/org/geotools/data/directory/DirectoryDataStoreTest.java $
  */
 public class DirectoryDataStoreTest extends TestSupport {
     

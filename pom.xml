@@ -60,6 +60,10 @@
   <!--     stress             Profile to active tests which end in -->
   <!--                        "StressTest.java"                    -->
   <!--                                                             -->
+  <!--								   -->
+  <!--     custom	      Allows custom deploying to a         -->
+  <!--			      different repository		   -->
+  <!--                                                             -->
   <!--   Example:                                                  -->
   <!--       mvn install -Dall                                     -->
   <!--       mvn eclipse:eclipse -Dall                             -->
@@ -175,6 +179,17 @@
         </site>
       </distributionManagement>
     </profile>
+    <profile>
+        <id>custom</id>
+        <distributionManagement>
+         <repository>
+          <id>${custom.repo.id}</id>
+          <name>${custom.repo.id} Maven Repository</name>
+          <url>${custom.repo.url}</url>
+          <uniqueVersion>false</uniqueVersion>
+         </repository>
+        </distributionManagement>
+    </profile>
   </profiles>
 
 
@@ -184,7 +199,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>geotools</artifactId>
   <packaging>pom</packaging>
-  <version>8.0-M1</version>
+  <version>8.0.0.M1osgi1</version>
   <name>Geotools</name>
 
   <scm>
@@ -570,32 +585,34 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>net.java.dev.jsr-275</groupId>
-        <artifactId>jsr-275</artifactId>
-        <version>1.0-beta-2</version>
+         <groupId>net.java.dev.osgi</groupId>
+         <artifactId>net.java.dev.osgi.jsr275</artifactId>
+         <version>1.0.0.beta-2</version>
       </dependency>
+      
 
       <!-- Java Advanced Imaging (JAI) -->
-      <dependency>
-        <groupId>javax.media</groupId>
-        <artifactId>jai_core</artifactId>
-        <version>1.1.3</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.media</groupId>
-        <artifactId>jai_codec</artifactId>
-        <version>1.1.3</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.media</groupId>
-        <artifactId>jai_imageio</artifactId>
-        <version>1.1</version>
-      </dependency>
+
+    <dependency>
+      <groupId>javax.media</groupId>
+      <artifactId>javax.media.jai.osgi</artifactId>
+      <version>1.1.3</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.media.jai.osgi</groupId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+      <version>1.1</version>
+    </dependency>
       
       <!-- ImageIO-Ext -->
       <dependency>
         <groupId>it.geosolutions.imageio-ext</groupId>
-        <artifactId>imageio-ext-tiff</artifactId>
+  	    <artifactId>de.berlios.it.geosolutions.imageio.ext.tiff</artifactId>
+        <version>${imageio.ext.version}</version>
+      </dependency
+      <dependency>
+        <groupId>it.geosolutions.imageio-ext</groupId>
+  	    <artifactId>de.berlios.it.geosolutions.imageio.ext.customstreams</artifactId>
         <version>${imageio.ext.version}</version>
       </dependency>
       <dependency>
@@ -701,30 +718,30 @@
 
       <!-- JAITools -->
       <dependency>
-        <groupId>org.jaitools</groupId>
-        <artifactId>jt-utils</artifactId>
+        <groupId>org.jaitools.osgi</groupId>
+        <artifactId>org.jaitools.osgi.jt-utils</artifactId>
         <version>${jt.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jaitools</groupId>
-        <artifactId>jt-vectorbinarize</artifactId>
+        <groupId>org.jaitools.osgi</groupId>
+        <artifactId>org.jaitools.osgi.jt-vectorbinarize</artifactId>
         <version>${jt.version}</version>
       </dependency> 
       <dependency>
-        <groupId>org.jaitools</groupId>
-        <artifactId>jt-zonalstats</artifactId>
+        <groupId>org.jaitools.osgi</groupId>
+        <artifactId>org.jaitools.osgi.jt-zonalstats</artifactId>
         <version>${jt.version}</version>
        </dependency>
       
       <!-- Mathematic, geometries, SVG... -->
       <dependency>
-        <groupId>java3d</groupId>
-        <artifactId>vecmath</artifactId>
-        <version>1.3.2</version>
+        <groupId>java3d.osgi</groupId>
+        <artifactId>java3d.osgi.vecmath</artifactId>
+        <version>1.3.1</version>
       </dependency>
       <dependency>
-        <groupId>com.vividsolutions</groupId>
-        <artifactId>jts</artifactId>
+        <groupId>com.vividsolutions.osgi</groupId>
+        <artifactId>com.vividsolutions.osgi.jts</artifactId>
         <version>1.12</version>
       </dependency>
       <dependency>
@@ -732,11 +749,13 @@
         <artifactId>wkb4j</artifactId>
         <version>1.0-RC1</version>
       </dependency>
+
       <dependency>
-        <groupId>org.apache.xmlgraphics</groupId>
-        <artifactId>batik-transcoder</artifactId>
-        <version>1.7</version>
+        <groupId>org.apache.batik.osgi</groupId>
+        <artifactId>org.apache.batik.osgi.transcoder</artifactId>
+        <version>1.6</version>
       </dependency>
+                  
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>batik-svggen</artifactId>
@@ -824,29 +843,29 @@
         <version>2.0.8</version>
       </dependency>
       <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.3</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.lang</artifactId>
+        <version>2.4.0</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.1</version>  <!-- Same as the dependency in commons-pool -->
+       <groupId>org.apache.commons</groupId>
+       <artifactId>com.springsource.org.apache.commons.collections</artifactId>
+       <version>3.2.0</version> 
       </dependency>
       <dependency>
-        <groupId>commons-pool</groupId>
-        <artifactId>commons-pool</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.pool</artifactId>
         <version>1.5.4</version>
       </dependency>
       <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.logging</artifactId>
         <version>1.1.1</version>
       </dependency>
       <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>1.2</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.io</artifactId>
+        <version>1.4.0</version>
       </dependency>
       <dependency>
         <groupId>log4j</groupId>
@@ -854,9 +873,9 @@
         <version>1.2.12</version>  <!-- Same as the dependency in commons-logging -->
       </dependency>
       <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils</artifactId>
-        <version>1.7.0</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
+        <version>1.7.0</version> 
       </dependency>
       <dependency>
         <groupId>commons-httpclient</groupId>
@@ -864,9 +883,9 @@
         <version>3.1</version>
       </dependency>
       <dependency>
-        <groupId>commons-dbcp</groupId>
-        <artifactId>commons-dbcp</artifactId>
-        <version>1.3</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
+        <version>1.2.2.osgi</version>
       </dependency>
       <dependency>
         <groupId>velocity</groupId>
@@ -911,9 +930,9 @@
         <version>5.1.5</version>
       </dependency>
       <dependency>
-        <groupId>hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>1.8.0.7</version>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>com.springsource.org.hsqldb</artifactId>
+        <version>1.8.0.9</version>
       </dependency>
       <dependency>
         <groupId>org.openplans</groupId>
@@ -1019,7 +1038,27 @@
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
         <version>3.4.4</version>
+        <exclusions>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
       </dependency>
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+      </dependency>      
     </dependencies>
   </dependencyManagement>
 
@@ -1059,6 +1098,21 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-eclipse-plugin</artifactId>
           <version>2.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.0.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1208,6 +1262,7 @@
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
         <configuration>
           <attach>true</attach>
         </configuration>
@@ -1383,6 +1438,12 @@
       <url>http://repo.opengeo.org</url>
     </repository>
 
+    <repository>
+      <id>com.springsource.repository.bundles.external</id>
+      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+
   </repositories>
 
   <!-- =========================================================== -->
@@ -1413,7 +1474,9 @@
   <!--     Modules for the build in approximate dependency order   -->
   <!-- =========================================================== -->
   <modules>
+    <module>thirdparty</module>
     <module>build</module>
     <module>modules</module>
+    <module>eclipse</module>
   </modules>
 </project>

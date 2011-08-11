@@ -47,7 +47,7 @@ import org.geotools.image.io.text.TextMetadataParser;
  * values are read by a {@link ImageReader} object.
  *
  * @since 2.2
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/ExoreferencedGridCoverageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/coverage/io/ExoreferencedGridCoverageReader.java $
  * @version $Id: ExoreferencedGridCoverageReader.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Martin Desruisseaux (IRD)
  * @author Cédric Briançon

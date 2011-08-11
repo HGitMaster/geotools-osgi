@@ -32,7 +32,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Gabriel Roldan
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeDescriptorPropertyHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeDescriptorPropertyHandler.java $
  */
 public class AttributeDescriptorPropertyHandler implements DynamicPropertyHandler {
 

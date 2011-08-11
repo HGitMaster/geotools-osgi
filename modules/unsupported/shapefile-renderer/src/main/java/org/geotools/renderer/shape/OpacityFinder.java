@@ -56,7 +56,7 @@ import org.opengis.filter.expression.Literal;
  * Searches for symbolizers with opacity.
  *
  * @author jones
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/OpacityFinder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/OpacityFinder.java $
  */
 public class OpacityFinder implements StyleVisitor {
     private Class[] acceptableTypes;

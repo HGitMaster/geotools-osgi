@@ -46,8 +46,8 @@ import org.opengis.filter.expression.Function;
  * factories from a central point.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/factory/CommonFactoryFinder.java $
- * @version $Id: CommonFactoryFinder.java 30990 2008-07-10 09:15:29Z aaime $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/factory/CommonFactoryFinder.java $
+ * @version $Id: CommonFactoryFinder.java 35586 2010-05-25 14:06:26Z aaime $
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
@@ -324,6 +324,17 @@ public final class CommonFactoryFinder extends FactoryFinder {
     public static synchronized void scanForPlugins() {
         if (registry != null) {
             registry.scanForPlugins();
+        }
+    }
+    
+    /**
+     * Resets the factory finder and prepares for a new full scan of the SPI subsystems
+     */
+    public static void reset() {
+        FactoryRegistry copy = registry;
+        registry = null;
+        if(copy != null) {
+            copy.deregisterAll();
         }
     }
 }

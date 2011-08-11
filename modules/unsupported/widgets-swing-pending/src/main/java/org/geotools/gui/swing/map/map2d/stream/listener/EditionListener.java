@@ -25,7 +25,7 @@ import org.geotools.gui.swing.map.map2d.stream.event.EditionEvent;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/listener/EditionListener.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/map/map2d/stream/listener/EditionListener.java $
  */
 public interface EditionListener extends EventListener{
     

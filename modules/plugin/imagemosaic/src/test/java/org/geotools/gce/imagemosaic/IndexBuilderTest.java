@@ -19,7 +19,7 @@ import org.geotools.gce.imagemosaic.IndexBuilder.ProcessingEventListener;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.test.TestData;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
@@ -29,7 +29,7 @@ import org.opengis.parameter.ParameterValue;
  * @author Simone Giannecchini, GeoSolutions SAS
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/IndexBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/imagemosaic/src/test/java/org/geotools/gce/imagemosaic/IndexBuilderTest.java $
  */
 public class IndexBuilderTest extends Assert {
 	
@@ -49,7 +49,7 @@ public class IndexBuilderTest extends Assert {
 	}
 
 	@Test
-	@Ignore
+//	@Ignore
 	public void indexBuilderConfiguration() throws FileNotFoundException, IOException, CloneNotSupportedException{
 		// create a stub configuration
 		final IndexBuilderConfiguration c1= new IndexBuilderConfiguration();
@@ -160,5 +160,12 @@ public class IndexBuilderTest extends Assert {
 		coverage = (GridCoverage2D) reader.read(new GeneralParameterValue[] {gg,useJai ,tileSize});
 		Assert.assertNotNull(coverage);
 		PlanarImage.wrapRenderedImage( coverage.getRenderedImage()).getTiles();;
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		//force initial ImageIO set up and reordering
+		new ImageMosaicFormatFactory();
+	
 	}
 }

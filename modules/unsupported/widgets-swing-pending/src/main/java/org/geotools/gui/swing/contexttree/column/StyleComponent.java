@@ -33,7 +33,7 @@ import org.geotools.styling.Symbolizer;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/StyleComponent.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/StyleComponent.java $
  */
 public final class StyleComponent extends org.geotools.gui.swing.contexttree.renderer.RenderAndEditComponent {
     

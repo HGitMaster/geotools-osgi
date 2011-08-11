@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>plugin</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
 
@@ -97,9 +97,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>javax.media.jai.osgi</groupId>
+      <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.media</groupId>
-      <artifactId>jai_imageio</artifactId>
-      <scope>provided</scope>  <!-- Users should execute JAI installer. -->
+      <artifactId>javax.media.jai.osgi</artifactId>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
 
     <!-- Test dependencies -->
@@ -107,12 +111,6 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt-sample-data</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
-      <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
   </dependencies>

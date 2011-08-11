@@ -40,7 +40,7 @@ import org.opengis.filter.expression.PropertyName;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/test/java/org/geotools/brewer/color/StyleGeneratorOnlineTest.java $
  */
 public class StyleGeneratorOnlineTest extends DataTestCase {
     static boolean WKB_ENABLED = true;

@@ -63,8 +63,8 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * 
  * @author Gabriel Roldan, Axios Engineering
- * @version $Id: AppSchemaDataAccessTest.java 33432 2009-07-02 05:40:44Z robatkinson $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessTest.java $
+ * @version $Id: AppSchemaDataAccessTest.java 35182 2010-04-07 06:58:28Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AppSchemaDataAccessTest.java $
  * @since 2.4
  */
 public class AppSchemaDataAccessTest extends TestCase {
@@ -103,6 +103,7 @@ public class AppSchemaDataAccessTest extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
+        DataAccessRegistry.unregisterAll();
     }
 
     /*

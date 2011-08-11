@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools.xsd</groupId>
     <artifactId>xsd</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
 
@@ -105,13 +105,13 @@
       <scope>test</scope>
     </dependency>    
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>com.springsource.org.apache.commons.io</artifactId>
       <scope>test</scope>
     </dependency>    
     <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
+      <groupId>org.custommonkey.xmlunit</groupId>
+      <artifactId>com.springsource.org.custommonkey.xmlunit</artifactId>
       <scope>test</scope>
     </dependency>    
   </dependencies>
@@ -273,7 +273,6 @@
             <printRecursionPaths>true</printRecursionPaths>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 

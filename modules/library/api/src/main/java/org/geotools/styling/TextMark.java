@@ -25,7 +25,7 @@ import org.opengis.filter.expression.Expression;
  * As of Symbology Encoding 1.1 specificationt here is a clean way to work with character
  * symbols - using an ExternalMark.getMarkIndex() to indicate which character to use.
  * 
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/api/src/main/java/org/geotools/styling/TextMark.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/api/src/main/java/org/geotools/styling/TextMark.java $
  * @deprecated Please use a ExternalMark.getMarkIndex() to pick out a character from a true type font
  */
 public interface TextMark extends Mark {

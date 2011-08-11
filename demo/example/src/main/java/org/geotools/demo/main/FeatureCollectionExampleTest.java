@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.Point;
  * </p>
  * @author Jody Garnett
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/main/FeatureCollectionExampleTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/main/FeatureCollectionExampleTest.java $
  */
 public class FeatureCollectionExampleTest extends TestCase {
     private FeatureCollection<SimpleFeatureType, SimpleFeature> features;

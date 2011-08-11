@@ -30,7 +30,7 @@ import org.geotools.resources.IndexedResourceBundle;
  * Default parameters for {@link GeographicImageReader}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/GeographicImageReadParam.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/GeographicImageReadParam.java $
  * @version $Id: GeographicImageReadParam.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

@@ -50,7 +50,7 @@ import org.opengis.filter.PropertyIsNull;
  * @author Debasish Sahu, debasish.sahu@rmsi.com
  * @author Harry Bullen
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/filter/SQLEncoderMySQL.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/main/java/org/geotools/filter/SQLEncoderMySQL.java $
  */
 public class SQLEncoderMySQL extends org.geotools.data.jdbc.FilterToSQL implements org.opengis.filter.FilterVisitor {
     /** Standard java logger */

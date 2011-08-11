@@ -21,6 +21,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.IndexColorModel;
+import java.awt.image.SampleModel;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -34,8 +35,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -63,6 +66,7 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.coverage.grid.io.UnknownFormat;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -82,6 +86,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.PixelInCell;
 
 import com.sun.media.imageioimpl.common.BogusColorSpace;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -95,8 +100,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 @SuppressWarnings("unchecked")
 final class IndexBuilder implements Runnable {
-
-
+    
 	/** Default Logger * */
 	final static Logger LOGGER = org.geotools.util.logging.Logging.getLogger(IndexBuilder.class);
 	
@@ -117,6 +121,7 @@ final class IndexBuilder implements Runnable {
 			this.locationAttribute=that.locationAttribute;
 			this.rootMosaicDirectory=that.rootMosaicDirectory;
 			this.wildcardString=that.wildcardString;
+			this.footprintManagement = that.footprintManagement;
 		}
 
 		public void setIndexingDirectories(List<String> indexingDirectories) {
@@ -135,6 +140,11 @@ final class IndexBuilder implements Runnable {
 		@Option(description="Wildcard to use for building the index of this mosaic",mandatory=false,name="wildcard")
 		private String wildcardString = ImageMosaicUtils.DEFAULT_WILCARD;
 		private List<String> indexingDirectories;
+		private boolean footprintManagement = ImageMosaicUtils.DEFAULT_FOOTPRINT_MANAGEMENT;
+
+		public boolean isFootprintManagement() {
+            return footprintManagement;
+        }
 
 		public List<String> getIndexingDirectories() {
 			return indexingDirectories;
@@ -200,9 +210,9 @@ final class IndexBuilder implements Runnable {
 		 * @see org.geotools.gce.imagemosaic.JMXIndexBuilderMBean#setRootMosaicDirectory(java.lang.String)
 		 */
 		public void setRootMosaicDirectory(final String rootMosaicDirectory) {
-			 ImageMosaicUtils.ensureNonNull("rootMosaicDirectory", rootMosaicDirectory);
+			 Utilities.ensureNonNull("rootMosaicDirectory", rootMosaicDirectory);
 			 String testingDirectory = rootMosaicDirectory;
-			 ImageMosaicUtils.checkInputDirectory(testingDirectory);
+			 DataUtilities.checkDirectory(new File(testingDirectory));
 			 this.rootMosaicDirectory=testingDirectory;
 
 		}		
@@ -230,6 +240,8 @@ final class IndexBuilder implements Runnable {
 			
 			if(this.absolute!=that.absolute)
 				return false;
+			if(this.footprintManagement!=that.footprintManagement)
+				 return false;
 			if(!(this.indexName==null&&that.indexName==null)&&!this.indexName.equals(that.indexName))
 				return false;	
 			if(!(this.locationAttribute==null&&that.locationAttribute==null)&&!this.locationAttribute.equals(that.locationAttribute))
@@ -247,6 +259,7 @@ final class IndexBuilder implements Runnable {
 		public int hashCode() {
 			int seed=37;
 			seed=Utilities.hash(absolute, seed);
+			seed=Utilities.hash(footprintManagement, seed);
 			seed=Utilities.hash(locationAttribute, seed);
 			seed=Utilities.hash(indexName, seed);
 			seed=Utilities.hash(wildcardString, seed);
@@ -262,6 +275,7 @@ final class IndexBuilder implements Runnable {
 			builder.append("wildcardString:\t\t\t").append(wildcardString).append("\n");
 			builder.append("indexName:\t\t\t").append(indexName).append("\n");
 			builder.append("absolute:\t\t\t").append(absolute).append("\n");
+			builder.append("footprintManagement:\t\t\t").append(footprintManagement).append("\n");
 			builder.append("locationAttribute:\t\t\t").append(locationAttribute).append("\n");
 			builder.append("rootMosaicDirectory:\t\t\t").append(rootMosaicDirectory).append("\n");
 			builder.append("indexingDirectories:\t\t\t").append(Utilities.deepToString(indexingDirectories)).append("\n");
@@ -273,6 +287,9 @@ final class IndexBuilder implements Runnable {
 
 		@Option(description="This index must use absolute or relative path",mandatory=false,name="absolute")
 		private Boolean absolute;
+		
+		@Option(description="This index must handle footprint",mandatory=false,name="footprintManagement")
+		private Boolean footprintManagement;
 		
 		@Option(description="Directories where to look for file to index",mandatory=true,name="indexingDirectories")
 		private String indexingDirectoriesString;
@@ -293,26 +310,29 @@ final class IndexBuilder implements Runnable {
 
 		public CommandLineIndexBuilderRunner(String[] args) {
 			super(args);
-			if(this.absolute==null)
-				this.absolute=ImageMosaicUtils.DEFAULT_PATH_BEHAVIOR;
-			if(this.indexName==null)
-				this.indexName=ImageMosaicUtils.DEFAULT_INDEX_NAME;
+			if(this.absolute == null)
+				this.absolute = ImageMosaicUtils.DEFAULT_PATH_BEHAVIOR;
+			if(this.footprintManagement == null)
+				this.footprintManagement = ImageMosaicUtils.DEFAULT_FOOTPRINT_MANAGEMENT;
+			if(this.indexName == null)
+				this.indexName = ImageMosaicUtils.DEFAULT_INDEX_NAME;
 		}
 
 
 		public static void main(String args[]){
 			final CommandLineIndexBuilderRunner runner = new CommandLineIndexBuilderRunner(args);
 			// prepare the configuration
-			final IndexBuilderConfiguration configuration= new IndexBuilderConfiguration();
-			configuration.absolute=runner.absolute;
-			configuration.indexName=runner.indexName;
-			configuration.rootMosaicDirectory=runner.rootMosaicDirectory;
-			configuration.wildcardString=runner.wildcardString;
-			configuration.locationAttribute=runner.locationAttribute;
+			final IndexBuilderConfiguration configuration = new IndexBuilderConfiguration();
+			configuration.absolute = runner.absolute;
+			configuration.indexName = runner.indexName;
+			configuration.footprintManagement = runner.footprintManagement;
+			configuration.rootMosaicDirectory = runner.rootMosaicDirectory;
+			configuration.wildcardString = runner.wildcardString;
+			configuration.locationAttribute = runner.locationAttribute;
 			
-			final String directories= runner.indexingDirectoriesString;
-			final String []dirs_=directories.split(",");
-			final List<String> dirs= new ArrayList<String>();
+			final String directories = runner.indexingDirectoriesString;
+			final String []dirs_ = directories.split(",");
+			final List<String> dirs = new ArrayList<String>();
 			for(String dir:dirs_)
 				dirs.add(dir);
 			configuration.indexingDirectories=dirs;
@@ -485,7 +505,7 @@ final class IndexBuilder implements Runnable {
 		protected void handleCancelled(File startDirectory, Collection results,
 				CancelException cancel) throws IOException {
 			// close things related to shapefiles
-			closeShapefileObjects();
+			closeShapeFileStores();
 			
 			//clean up objects
 			
@@ -528,7 +548,7 @@ final class IndexBuilder implements Runnable {
 			}
 			validFileName=FilenameUtils.getName(validFileName);
 			fireEvent(Level.INFO,"Now indexing file "+validFileName, ((fileIndex * 100.0) / numFiles));
-			ImageInputStream inStream=null;
+			ImageInputStream inStream = null;
 			ImageReader imageioReader = null;
 			AbstractGridCoverage2DReader coverageReader=null;
 			try {
@@ -624,6 +644,7 @@ final class IndexBuilder implements Runnable {
 					// /////////////////////////////////////////////////////////////////////
 					
 					defaultCM = its.getColorModel();
+					defaultSM = its.getSampleModel();
 					if (defaultCM instanceof IndexColorModel) {
 						IndexColorModel icm = (IndexColorModel) defaultCM;
 						int numBands = defaultCM.getNumColorComponents();
@@ -705,7 +726,7 @@ final class IndexBuilder implements Runnable {
 					// create the schema for the new shape file
 					store.createSchema(simpleFeatureType);
 					// get a feature writer
-					fw = store.getFeatureWriter(store.getTypeNames()[0],Transaction.AUTO_COMMIT);
+					fw = store.getFeatureWriter(simpleFeatureType.getTypeName(),Transaction.AUTO_COMMIT);
 				} else {
 					// ////////////////////////////////////////////////////////
 					// 
@@ -762,7 +783,8 @@ final class IndexBuilder implements Runnable {
 				// ////////////////////////////////////////////////////////
 				final SimpleFeature feature = fw.next();
 				feature.setAttribute(1, geomFactory.toGeometry(new ReferencedEnvelope((Envelope) envelope)));
-				feature.setAttribute(0, prepareLocation(fileBeingProcessed));
+				final String location = prepareLocation(fileBeingProcessed);
+				feature.setAttribute(0, location);
 				fw.write();
 
 				// fire event
@@ -787,7 +809,7 @@ final class IndexBuilder implements Runnable {
 				//
 				// ////////////////////////////////////////////////////////
 				try {
-					if(inStream!=null)
+					if (inStream != null)
 						inStream.close();
 				} catch (Throwable e) {
 					// ignore exception
@@ -825,9 +847,10 @@ final class IndexBuilder implements Runnable {
 				return fileBeingProcessed.getAbsolutePath();
 			
 			// relative
-			String path=fileBeingProcessed.getCanonicalPath();
+			String path=FilenameUtils.normalize(fileBeingProcessed.getAbsolutePath());
 			path=path.substring(runConfiguration.rootMosaicDirectory.length());
-			return path;
+			String relative = new File(runConfiguration.rootMosaicDirectory).toURI().relativize(new File(fileBeingProcessed.getAbsolutePath()).toURI()).getPath();
+			return relative;
 			
 		}
 
@@ -1002,9 +1025,11 @@ final class IndexBuilder implements Runnable {
 	private GeometryFactory geomFactory;
 
 	private ShapefileDataStore store;
+	
+	private ShapefileDataStore footprintStore;
 
 	private FeatureWriter<SimpleFeatureType, SimpleFeature> fw = null;
-
+	
 	private int numberOfProcessedFiles;
 
 	/**
@@ -1018,8 +1043,19 @@ final class IndexBuilder implements Runnable {
 	private GeneralEnvelope globalEnvelope = null;
 
 	private int fileIndex=0;
+	
+	/** A Map containing footprints represented as <location, Geometry> pairs
+	 * where location refers to a mosaic granule location.   
+	 */
+	private Map<String,Geometry> footprintsLocationGeometryMap;
 
+	private File footprintShapeFile;
+        
+	private File footprintSummaryFile;
+        
 	private ColorModel defaultCM = null;
+	
+	private SampleModel defaultSM;
 
 	private CoordinateReferenceSystem defaultCRS = null;
 
@@ -1041,7 +1077,7 @@ final class IndexBuilder implements Runnable {
 			//
 			// creating the file filters for scanning for files to check and index
 			//
-			final IOFileFilter finalFilter = createIndexingFilter();
+			final IOFileFilter finalFilter = createIndexingFilter(new WildcardFileFilter(runConfiguration.wildcardString,IOCase.INSENSITIVE));
 			
 			//TODO we might want to remove this in the future for performance
 			numFiles=0;
@@ -1056,8 +1092,7 @@ final class IndexBuilder implements Runnable {
 			//
 			// walk over the files that have filtered out
 			//
-			if(numFiles>0)
-			{
+			if(numFiles>0) {
 				indexingPreamble();
 				for(String indexingDirectory:runConfiguration.indexingDirectories){
 					@SuppressWarnings("unused")
@@ -1065,36 +1100,35 @@ final class IndexBuilder implements Runnable {
 				}
 				indexingPostamble();
 			}
-				
-			
 			
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
 		} 
 
 	}
-
+	
 	/**
 	 * @return
 	 */
-	private IOFileFilter createIndexingFilter() {
-		final IOFileFilter specialWildCardFileFilter= new WildcardFileFilter(runConfiguration.wildcardString,IOCase.INSENSITIVE);
+	static IOFileFilter createIndexingFilter(final IOFileFilter specialWildCardFileFilter) {
 		IOFileFilter dirFilter = 
 		    FileFilterUtils.andFileFilter(FileFilterUtils.directoryFileFilter(),HiddenFileFilter.VISIBLE);
-		IOFileFilter fileFilter=ImageMosaicUtils.excludeFilters(
+		IOFileFilter fileFilter= FileFilterUtils.asFileFilter(DataUtilities.excludeFilters(
 			FileFilterUtils.makeSVNAware(
 					FileFilterUtils.makeFileOnly(
 							FileFilterUtils.andFileFilter(
 									specialWildCardFileFilter,HiddenFileFilter.VISIBLE))), 
 									FileFilterUtils.suffixFileFilter("shp"),
 									FileFilterUtils.suffixFileFilter("dbf"),
-									FileFilterUtils.suffixFileFilter("shx"), 
+									FileFilterUtils.suffixFileFilter("fpt"),
+									FileFilterUtils.suffixFileFilter("shx"),
+									FileFilterUtils.prefixFileFilter(FootprintUtils.FOOTPRINT_PREFIX), 
 									FileFilterUtils.suffixFileFilter("prj"), 
 									FileFilterUtils.nameFileFilter("error.txt"),
 									FileFilterUtils.nameFileFilter("error.txt.lck"),
 									FileFilterUtils.suffixFileFilter("properties"),
 									FileFilterUtils.suffixFileFilter("svn-base")
-									);
+									));
 
 		// exclude common extensions
 		Set<String> extensions=WorldImageFormat.getWorldExtension("png");
@@ -1152,19 +1186,24 @@ final class IndexBuilder implements Runnable {
 	 * @throws IllegalArgumentException 
 	 */
 	public IndexBuilder(final IndexBuilderConfiguration configuration)  {
-		ImageMosaicUtils.ensureNonNull("runConfiguration", configuration);
+		Utilities.ensureNonNull("runConfiguration", configuration);
 		//check parameters
 		if(configuration.indexingDirectories==null||configuration.indexingDirectories.size()<=0)
 			throw new IllegalArgumentException("Indexing directories are empty");
 		final List<String> directories= new ArrayList<String>();
-		for(String dir:configuration.indexingDirectories)
-			directories.add(ImageMosaicUtils.checkInputDirectory(dir));
+		for(String dir:configuration.indexingDirectories) {
+			directories.add(FilenameUtils.normalize(DataUtilities.checkDirectory(new File(dir)).getPath()));
+		}
 		configuration.indexingDirectories=directories;
+		
 		if(configuration.indexName==null||configuration.indexName.length()==0)
 			throw new IllegalArgumentException("Index name cannot be empty");
+		
 		if(configuration.rootMosaicDirectory==null||configuration.rootMosaicDirectory.length()==0)
 			throw new IllegalArgumentException("RootMosaicDirectory name cannot be empty");
-		configuration.rootMosaicDirectory=ImageMosaicUtils.checkInputDirectory(configuration.rootMosaicDirectory);
+		configuration.rootMosaicDirectory=DataUtilities.checkDirectory(new File(configuration.rootMosaicDirectory)).getAbsolutePath();
+		configuration.rootMosaicDirectory=FilenameUtils.normalize(configuration.rootMosaicDirectory);
+		
 		if(configuration.wildcardString==null||configuration.wildcardString.length()==0)
 			throw new IllegalArgumentException("WildcardString name cannot be empty");		
 		this.runConfiguration = new IndexBuilderConfiguration(configuration);
@@ -1197,15 +1236,22 @@ final class IndexBuilder implements Runnable {
 		// clear stop
 		stop=false;
 	
-		closeShapefileObjects();
+		closeShapeFileStores();
 		
 		//clear other stuff
 		globalEnvelope=null;
 		defaultCM=null;
+		defaultSM=null;
 		defaultCRS=null;
 		defaultPalette=null;
 		fileIndex=0;
 		numberOfProcessedFiles=0;
+		
+		footprintShapeFile = null;
+		footprintSummaryFile = null;
+		if (footprintsLocationGeometryMap != null && !footprintsLocationGeometryMap.isEmpty())
+		    footprintsLocationGeometryMap.clear();
+		footprintsLocationGeometryMap = null;
 		
 		// clear directories
 		runConfiguration=null;
@@ -1333,79 +1379,130 @@ final class IndexBuilder implements Runnable {
 		stop = true;
 	}
 
-	private void indexingPreamble()throws IOException {
-		
-		//
-		// declaring a precision model to adhere the java double type
-		// precision
-		//
-		final PrecisionModel precMod = new PrecisionModel(PrecisionModel.FLOATING);
-		geomFactory = new GeometryFactory(precMod);
-		try {
-			
-			store = new ShapefileDataStore(new File(runConfiguration.rootMosaicDirectory ,runConfiguration.indexName + ".shp").toURI().toURL());
-		} catch (MalformedURLException ex) {
-			if (LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-			fireException(ex);
-			return;
-		}
-	
-		//
-		// creating a mosaic runConfiguration bean to store the properties file elements			
-		//
-		mosaicConfiguration= new ImageMosaicUtils.MosaicConfigurationBean();
-			
-	}
+    private void indexingPreamble() throws IOException {
 
-	
-	private void indexingPostamble() throws IOException {
-		//close shapefile elements
-		closeShapefileObjects();
-		
-		// complete initialization of mosaic oconfiguration
-		if(numberOfProcessedFiles>0){
-			mosaicConfiguration.setName(runConfiguration.indexName);
-			mosaicConfiguration.setExpandToRGB(mustConvertToRGB);
-			mosaicConfiguration.setAbsolutePath(runConfiguration.absolute);
-			mosaicConfiguration.setLocationAttribute(runConfiguration.locationAttribute);
-			mosaicConfiguration.setEnvelope2D(new Envelope2D(globalEnvelope));
-			createPropertiesFiles();
-			
-			// processing information
-			fireEvent(Level.FINE,"Done!!!", 100);				
-		}
-		else
-			//	processing information
-			fireEvent(Level.FINE,"Nothing to process!!!", 100);
-	}
+        //
+        // declaring a precision model to adhere the java double type
+        // precision
+        //
+        final PrecisionModel precMod = new PrecisionModel(PrecisionModel.FLOATING);
+        geomFactory = new GeometryFactory(precMod);
+        final boolean handleFootprint = !ImageMosaicUtils.IGNORE_FOOTPRINT || runConfiguration.isFootprintManagement();
+        try {
+            store = new ShapefileDataStore(new File(runConfiguration.rootMosaicDirectory, runConfiguration.indexName + ".shp").toURI().toURL());
+            if (handleFootprint && footprintShapeFile == null) {
+                footprintShapeFile = FootprintUtils.searchFootprint(runConfiguration.rootMosaicDirectory);
+            }
+            if (handleFootprint && (footprintsLocationGeometryMap == null || footprintsLocationGeometryMap.isEmpty()) 
+                    && footprintShapeFile != null && footprintShapeFile.exists() && footprintShapeFile.canRead()) {
+                footprintsLocationGeometryMap = new HashMap<String, Geometry>();
+                footprintStore = new ShapefileDataStore(DataUtilities.fileToURL(footprintShapeFile));
+                footprintSummaryFile = new File(runConfiguration.rootMosaicDirectory, runConfiguration.indexName + FootprintUtils.FOOTPRINT_EXT);
+                FootprintUtils.initFootprintsLocationGeometryMap(footprintStore, footprintsLocationGeometryMap);
+            }
+        } catch (MalformedURLException ex) {
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            fireException(ex);
+            return;
+        }
 
-	private void closeShapefileObjects() {
-		try {
-			if (fw != null)
-				fw.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-		}
-	
-		fw=null;
-		
-		try {
-			if(store!=null)
-				store.dispose();
-		} catch (Throwable e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-		}
-	
-		store=null;
-		
+        //
+        // creating a mosaic runConfiguration bean to store the properties file
+        // elements
+        //
+        mosaicConfiguration = new ImageMosaicUtils.MosaicConfigurationBean();
 
+    }
 
-	}
+    private void indexingPostamble() throws IOException {
+        try {
+            if (fw != null)
+                fw.close();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+        }
+
+        fw = null;
+
+        // close shapefile elements
+        closeShapeFileStores();
+
+        // create the sample image file
+        createSampleImage();
+
+        try {
+            if (footprintSummaryFile != null) {
+                FootprintUtils.writeFootprintSummary(footprintSummaryFile,new File(runConfiguration.rootMosaicDirectory, runConfiguration.indexName + ".shp"), footprintsLocationGeometryMap);
+            }
+        } catch (Throwable e) {
+            // ignore exception
+            if (LOGGER.isLoggable(Level.FINEST))
+                LOGGER.log(Level.FINEST, e.getLocalizedMessage(), e);
+        }
+        
+        // complete initialization of mosaic configuration
+        if (numberOfProcessedFiles > 0) {
+            mosaicConfiguration.setName(runConfiguration.indexName);
+            mosaicConfiguration.setExpandToRGB(mustConvertToRGB);
+            mosaicConfiguration.setAbsolutePath(runConfiguration.absolute);
+            mosaicConfiguration.setLocationAttribute(runConfiguration.locationAttribute);
+            mosaicConfiguration.setEnvelope2D(new Envelope2D(globalEnvelope));
+            mosaicConfiguration.setFootprintManagement(runConfiguration.footprintManagement);
+            createPropertiesFiles();
+
+            // processing information
+            fireEvent(Level.FINE, "Done!!!", 100);
+        } else {
+            // processing information
+            fireEvent(Level.FINE, "Nothing to process!!!", 100);
+        }
+    }
+
+    /**
+     * Store a sample image from which we can derive the default SM and CM
+     */
+    private void createSampleImage() {
+        // create a sample image to store SM and CM
+        if (defaultCM != null && defaultSM != null) {
+
+            // sample image file
+            final File sampleImageFile = new File(runConfiguration.getRootMosaicDirectory() + "/sample_image");
+            try {
+                ImageMosaicUtils.storeSampleImage(sampleImageFile, defaultSM, defaultCM);
+            } catch (IOException e) {
+                fireEvent(Level.SEVERE, e.getLocalizedMessage(), 0);
+            }
+        }
+
+    }
+
+    /**
+     * Attempt to close and dispose previously opened shapefile datastores
+     */
+    private void closeShapeFileStores() {
+        try {
+            if (store != null)
+                store.dispose();
+        } catch (Throwable e) {
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+        }
+
+        store = null;
+
+        try {
+            if (footprintStore != null)
+                footprintStore.dispose();
+        } catch (Throwable e) {
+            if (LOGGER.isLoggable(Level.SEVERE))
+                LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+        }
+
+        footprintStore = null;
+    }
 
 	/**
-	 * @param globalEnvelope
-	 * @param doneSomething
 	 */
 	private void createPropertiesFiles() {
 		// /////////////////////////////////////////////////////////////////////
@@ -1445,6 +1542,7 @@ final class IndexBuilder implements Runnable {
 			// suggested spi
 			properties.setProperty("SuggestedSPI", cachedSPI.getClass().getName());
 		}
+		properties.setProperty("FootprintManagement", Boolean.toString(runConfiguration.isFootprintManagement()));
 		
 		OutputStream outStream=null;
 		try {
@@ -1457,9 +1555,9 @@ final class IndexBuilder implements Runnable {
 		}
 		finally{
 			try{
-				if(outStream!=null)
+				if (outStream!=null)
 					outStream.close();
-			}catch (Throwable e) {
+			} catch (Throwable e) {
 	
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);

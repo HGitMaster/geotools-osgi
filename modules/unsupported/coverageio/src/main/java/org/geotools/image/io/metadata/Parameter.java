@@ -24,7 +24,7 @@ import org.opengis.parameter.ParameterValue;
  * {@linkplain GeographicMetadataFormat geographic metadata format}.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Parameter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Parameter.java $
  * @version $Id: Parameter.java 30965 2008-07-09 10:04:21Z cedricbr $
  * @author Cédric Briançon
  *

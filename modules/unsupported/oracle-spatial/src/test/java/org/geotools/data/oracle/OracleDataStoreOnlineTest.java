@@ -77,7 +77,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleDataStoreOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/oracle-spatial/src/test/java/org/geotools/data/oracle/OracleDataStoreOnlineTest.java $
  */
 public class OracleDataStoreOnlineTest extends TestCase {
     private FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();

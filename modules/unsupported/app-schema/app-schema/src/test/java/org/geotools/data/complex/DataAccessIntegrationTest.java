@@ -18,6 +18,7 @@ package org.geotools.data.complex;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.awt.RenderingHints.Key;
 import java.io.File;
@@ -44,7 +45,6 @@ import org.geotools.data.Query;
 import org.geotools.data.QueryCapabilities;
 import org.geotools.data.ResourceInfo;
 import org.geotools.data.ServiceInfo;
-import org.geotools.data.complex.config.CatalogUtilities;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.FeatureTypeRegistry;
 import org.geotools.data.property.PropertyDataStore;
@@ -57,15 +57,14 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.Types;
 import org.geotools.feature.type.AttributeDescriptorImpl;
-import org.geotools.feature.type.ComplexFeatureTypeImpl;
 import org.geotools.feature.type.FeatureTypeImpl;
 import org.geotools.filter.FilterFactoryImplNamespaceAware;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml3.GMLSchema;
+import org.geotools.xml.SchemaIndex;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureVisitor;
 import org.opengis.feature.Property;
@@ -89,11 +88,11 @@ import org.xml.sax.helpers.NamespaceSupport;
  * 
  * @author Rini Angreani, Curtin University of Technology
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/DataAccessIntegrationTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/DataAccessIntegrationTest.java $
  */
 public class DataAccessIntegrationTest {
 
-    protected static final String GSMLNS = "http://www.cgi-iugs.org/xml/GeoSciML/2";
+    protected static final String GSMLNS = "urn:cgi:xmlns:CGI:GeoSciML:2.0";
 
     protected static final String GMLNS = "http://www.opengis.net/gml";
 
@@ -153,7 +152,22 @@ public class DataAccessIntegrationTest {
     public static void setUp() throws Exception {
         setFilterFactory();
         loadGeologicUnitDataAccess();
-        loadDataAccesses("MappedFeaturePropertyfile.xml");
+        // Load CGI Term Value data access
+        URL url = DataAccessIntegrationTest.class.getResource(schemaBase + "CGITermValue.xml");
+        assertNotNull(url);
+        Map<String, Serializable> dsParams = new HashMap<String, Serializable>();
+        dsParams.put("dbtype", "app-schema");
+        dsParams.put("url", url.toExternalForm());
+        DataAccess<FeatureType, Feature> cgiDataAccess = DataAccessFinder.getDataStore(dsParams);
+        assertNotNull(cgiDataAccess);
+        // Load composition part data access
+        url = DataAccessIntegrationTest.class.getResource(schemaBase + "CompositionPart.xml");
+        assertNotNull(url);        
+        dsParams.put("url", url.toExternalForm());
+        DataAccessFinder.getDataStore(dsParams);
+        // Load Mapped Feature data access
+        loadDataAccess("MappedFeaturePropertyfile.xml");
+        
     }
 
     /**
@@ -255,7 +269,7 @@ public class DataAccessIntegrationTest {
 
                 // feature chaining link
                 properties.add(new AttributeImpl(next.getID(),
-                        (AttributeDescriptor) ComplexFeatureTypeImpl.FEATURE_CHAINING_LINK, null));
+                        (AttributeDescriptor) ComplexFeatureConstants.FEATURE_CHAINING_LINK, null));
 
                 lastFeature = new FeatureImpl(properties, featureDesc, next.getIdentifier());
                 features.add(lastFeature);
@@ -306,8 +320,8 @@ public class DataAccessIntegrationTest {
             for (Property property : nestedGuFeatures) {
                 Object value = property.getValue();
                 assertNotNull(value);
-                assertEquals(value instanceof Collection, true);
-                assertEquals(((Collection) value).size(), 1);
+                assertTrue(value instanceof Collection);
+                assertEquals(1, ((Collection) value).size());
 
                 Feature nestedGuFeature = (Feature) ((Collection) value).iterator().next();
                 /**
@@ -315,17 +329,17 @@ public class DataAccessIntegrationTest {
                  */
                 // make sure each of the nested geologic unit is valid
                 guId = nestedGuFeature.getIdentifier().toString();
-                assertEquals(true, guMap.containsKey(guId));
+                assertTrue(guMap.containsKey(guId));
 
                 nestedGuIds.add(guId);
 
                 // make sure the nested geologic unit feature has the right properties
                 guFeature = guMap.get(guId.toString());
                 Collection<Property> guProperties = guFeature.getProperties();
-                assertEquals(guProperties, nestedGuFeature.getProperties());
+                assertEquals(nestedGuFeature.getProperties(), guProperties);
             }
             // make sure all the nested geological unit features are there
-            assertEquals(nestedGuIds.containsAll(Arrays.asList(guIds)), true);
+            assertTrue(nestedGuIds.containsAll(Arrays.asList(guIds)));
         }
     }
 
@@ -357,7 +371,7 @@ public class DataAccessIntegrationTest {
         FeatureCollection<FeatureType, Feature> filteredResults = mfDataAccess.getFeatureSource(
                 MAPPED_FEATURE).getFeatures(filter);
 
-        assertEquals(filteredResults.size(), 3);
+        assertEquals(3, filteredResults.size());
     }
 
     /**
@@ -366,9 +380,9 @@ public class DataAccessIntegrationTest {
      * @throws IOException
      */
     private static void loadGeologicUnitDataAccess() throws IOException {
-        Map<String, Serializable> moParams = new HashMap<String, Serializable>();
-        moParams.put("dbtype", "input-data-access");
-        DataAccess<FeatureType, Feature> inputDataAccess = DataAccessFinder.getDataStore(moParams);
+        Map<String, Serializable> erParams = new HashMap<String, Serializable>();
+        erParams.put("dbtype", "input-data-access");
+        DataAccess<FeatureType, Feature> inputDataAccess = DataAccessFinder.getDataStore(erParams);
         guFeatureSource = inputDataAccess.getFeatureSource(GEOLOGIC_UNIT);
     }
 
@@ -379,7 +393,7 @@ public class DataAccessIntegrationTest {
      *            Mapped feature mapping file with geologic unit as specification
      * @throws IOException
      */
-    protected static void loadDataAccesses(String mfMappingFile) throws IOException {
+    protected static void loadDataAccess(String mfMappingFile) throws IOException {
         /**
          * Load mapped feature data access
          */
@@ -404,26 +418,11 @@ public class DataAccessIntegrationTest {
             mfFeatures.add(mfIterator.next());
         }
         mfCollection.close(mfIterator);
-
+        
         /**
-         * Load CGI Term Value data access
+         * Get composition part data access features
          */
-        url = DataAccessIntegrationTest.class.getResource(schemaBase + "CGITermValue.xml");
-        assertNotNull(url);
-
-        dsParams.put("url", url.toExternalForm());
-        DataAccess<FeatureType, Feature> cgiDataAccess = DataAccessFinder.getDataStore(dsParams);
-        assertNotNull(cgiDataAccess);
-
-        /**
-         * Load composition part data access
-         */
-        url = DataAccessIntegrationTest.class.getResource(schemaBase + "CompositionPart.xml");
-        assertNotNull(url);
-
-        dsParams.put("dbtype", "app-schema");
-        dsParams.put("url", url.toExternalForm());
-        DataAccess<FeatureType, Feature> cpDataAccess = DataAccessFinder.getDataStore(dsParams);
+        DataAccess<FeatureType, Feature> cpDataAccess = DataAccessRegistry.getDataAccess(COMPOSITION_PART);
         assertNotNull(cpDataAccess);
         FeatureSource<FeatureType, Feature> cpSource = cpDataAccess
                 .getFeatureSource(COMPOSITION_PART);
@@ -476,12 +475,9 @@ public class DataAccessIntegrationTest {
             FeatureCollection<SimpleFeatureType, SimpleFeature> fCollection = simpleFeatureSource
                     .getFeatures();
             reader = EmfAppSchemaReader.newInstance();
-            // set catalog
-            URL catalogLocation = getClass().getResource(schemaBase + "mappedPolygons.oasis.xml");
-            reader.setCatalog(CatalogUtilities.buildPrivateCatalog(catalogLocation));
             // set schema URI
-            SchemaIndex schemaIndex = reader.parse(new URL(schemaURL.toString() + File.separator
-                    + "commonSchemas_new/GeoSciML/geologicUnit.xsd"), null);
+            SchemaIndex schemaIndex = reader.parse(new URL(
+                    "http://www.geosciml.org/geosciml/2.0/xsd/geosciml.xsd"), null);
             typeRegistry = new FeatureTypeRegistry();
             typeRegistry.addSchemas(schemaIndex);
 
@@ -493,7 +489,8 @@ public class DataAccessIntegrationTest {
             FeatureType guSchema = new FeatureTypeImpl(GEOLOGIC_UNIT, simpleType.getDescriptors(),
                     null, true, simpleType.getRestrictions(), GMLSchema.ABSTRACTFEATURETYPE_TYPE,
                     null);
-            return new InputDataAccess(inputFeatures, guSchema);
+            return new InputDataAccess(inputFeatures, guSchema,                    
+                    FeatureChainingTest.GEOLOGIC_UNIT_NAME);
         }
 
         public String getDescription() {
@@ -526,10 +523,10 @@ public class DataAccessIntegrationTest {
 
             private ArrayList<Name> names = new ArrayList<Name>();
 
-            public InputDataAccess(Collection<Feature> features, FeatureType schema) {
+            public InputDataAccess(Collection<Feature> features, FeatureType schema, Name fTypeName) {
                 InputFeatureCollection fCollection = new InputFeatureCollection(schema, features);
                 fSource = new InputFeatureSource(fCollection, this);
-                names.add(fSource.getName());
+                names.add(fTypeName);
                 DataAccessRegistry.register(this);
             }
 

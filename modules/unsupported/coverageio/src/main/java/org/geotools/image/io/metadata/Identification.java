@@ -24,7 +24,7 @@ import org.geotools.util.Utilities;
  * An immutable ({@code "name"}, {@code "type"}) pair.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Identification.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/Identification.java $
  * @version $Id: Identification.java 30775 2008-06-20 15:50:30Z cedricbr $
  * @author Martin Desruisseaux
  */

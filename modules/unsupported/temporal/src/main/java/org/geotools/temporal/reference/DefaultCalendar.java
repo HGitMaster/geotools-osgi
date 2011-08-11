@@ -40,7 +40,7 @@ import org.opengis.temporal.TemporalCoordinateSystem;
  *
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/reference/DefaultCalendar.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/reference/DefaultCalendar.java $
  */
 public class DefaultCalendar extends DefaultTemporalReferenceSystem implements Calendar {
 

@@ -18,7 +18,7 @@ package org.geotools.renderer.shape;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/ScreenMap.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/shapefile-renderer/src/main/java/org/geotools/renderer/shape/ScreenMap.java $
  */
 public class ScreenMap {
     int[] pixels;

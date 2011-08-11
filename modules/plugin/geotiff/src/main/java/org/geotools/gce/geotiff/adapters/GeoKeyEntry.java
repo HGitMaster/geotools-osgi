@@ -36,7 +36,7 @@ import org.geotools.util.Utilities;
  * @author Simone Giannecchini, GeoSolutions
  * @author Mike Nidel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/adapters/GeoKeyEntry.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/geotiff/src/main/java/org/geotools/gce/geotiff/adapters/GeoKeyEntry.java $
  */
 public final class GeoKeyEntry implements Comparable<GeoKeyEntry>{
 	@Override

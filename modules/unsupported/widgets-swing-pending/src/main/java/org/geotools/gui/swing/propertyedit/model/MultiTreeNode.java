@@ -26,7 +26,7 @@ import org.geotools.gui.swing.propertyedit.PropertyPane;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/MultiTreeNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/MultiTreeNode.java $
  */
 public class MultiTreeNode extends DefaultMutableTreeNode{
     

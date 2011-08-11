@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Tests {@link TreeTileManager}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TreeTileManagerTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/TreeTileManagerTest.java $
  * @version $Id: TreeTileManagerTest.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux
  */

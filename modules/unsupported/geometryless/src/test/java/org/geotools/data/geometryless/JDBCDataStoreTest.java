@@ -64,7 +64,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  * @author Rob Atkinson
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/JDBCDataStoreTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/test/java/org/geotools/data/geometryless/JDBCDataStoreTest.java $
  */
 public class JDBCDataStoreTest extends TestCase {
     /** The logger for the filter module. */

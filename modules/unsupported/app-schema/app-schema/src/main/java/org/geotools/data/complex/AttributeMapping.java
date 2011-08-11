@@ -30,7 +30,7 @@ import org.opengis.filter.expression.Expression;
  * @author Gabriel Roldan, Axios Engineering
  * @author Rini Angreani, Curtin University of Technology
  * @version $Id: AttributeMapping.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AttributeMapping.java $
  * @since 2.4
  */
 public class AttributeMapping {

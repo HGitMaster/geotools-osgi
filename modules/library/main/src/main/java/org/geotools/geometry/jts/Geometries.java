@@ -77,7 +77,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Justin Deoliveira, The Open Planning Project
  * @author Michael Bedward
  * @since 2.6
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/main/src/main/java/org/geotools/geometry/jts/Geometries.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/main/src/main/java/org/geotools/geometry/jts/Geometries.java $
  * @version $Id: Geometries.java 34588 2009-12-01 13:58:21Z jdeolive $
  */
 public enum Geometries {

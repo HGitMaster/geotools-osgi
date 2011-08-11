@@ -39,7 +39,7 @@ import org.opengis.temporal.TemporalCoordinateSystem;
  * 
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/Utils.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/main/java/org/geotools/temporal/object/Utils.java $
  */
 public class Utils {
 

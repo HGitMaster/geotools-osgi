@@ -28,7 +28,7 @@ import org.opengis.filter.Filter;
  * implement createAttributeType
  *
  * @author Ian Schneider, USDA-ARS
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/AttributeTypeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/AttributeTypeFactory.java $
  * @version $Id: AttributeTypeFactory.java 30647 2008-06-12 18:58:42Z acuster $
  */
 public abstract class AttributeTypeFactory implements Factory {

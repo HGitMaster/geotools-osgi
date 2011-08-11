@@ -27,7 +27,7 @@ import org.geotools.styling.StyleBuilder;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JStrokePane.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JStrokePane.java $
  */
 public class JStrokePane extends javax.swing.JPanel implements StyleElementEditor<Stroke>{
     

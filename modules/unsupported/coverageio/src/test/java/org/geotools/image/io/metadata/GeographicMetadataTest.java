@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link GeographicMetadata}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/metadata/GeographicMetadataTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/metadata/GeographicMetadataTest.java $
  * @version $Id: GeographicMetadataTest.java 30996 2008-07-10 13:28:59Z cedricbr $
  * @author Martin Desruisseaux
  * @author Cédric Briançon

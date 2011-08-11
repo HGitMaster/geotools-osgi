@@ -28,7 +28,7 @@ import org.geotools.swing.data.JFileDataStoreChooser;
  * They are intended to answer some of the "bonus" questions and explore the finer points
  * of using a shape file.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/example/src/main/java/org/geotools/demo/Quickstart2.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/example/src/main/java/org/geotools/demo/Quickstart2.java $
  */
 public class Quickstart2 {
 

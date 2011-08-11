@@ -39,7 +39,7 @@ import org.opengis.filter.sort.SortOrder;
  * @author Gabriel Roldan (TOPP)
  * @version $Id: PostgisSQLBuilderTest.java 30669 2008-06-12 23:36:58Z acuster $
  * @since 2.5.x
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisSQLBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisSQLBuilderTest.java $
  */
 public class PostgisSQLBuilderTest extends TestCase {
 

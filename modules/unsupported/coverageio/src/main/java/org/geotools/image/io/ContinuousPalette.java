@@ -32,7 +32,7 @@ import org.geotools.resources.image.ComponentColorModelJAI;
  * {@link DataBuffer#TYPE_FLOAT}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/ContinuousPalette.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/ContinuousPalette.java $
  * @version $Id: ContinuousPalette.java 30836 2008-07-01 18:02:49Z desruisseaux $
  * @author Martin Desruisseaux
  */

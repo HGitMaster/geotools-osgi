@@ -33,7 +33,7 @@ import org.geotools.data.DataUtilities;
  * @author David Zwiers, Refractions Research, Inc.
  *
  * @see DataStoreFactorySpi
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/directory/src/main/java/org/geotools/data/dir/DirectoryDataStoreFactory.java $
  * @deprecated Use {@link org.geotools.data.directory.DirectoryDataStoreFactory} instead
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {

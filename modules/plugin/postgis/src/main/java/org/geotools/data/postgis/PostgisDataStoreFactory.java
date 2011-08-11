@@ -44,7 +44,7 @@ import org.opengis.util.InternationalString;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisDataStoreFactory.java $
  */
 public class PostgisDataStoreFactory extends AbstractDataStoreFactory
     implements org.geotools.data.DataStoreFactorySpi {

@@ -44,6 +44,8 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.xml.sax.helpers.NamespaceSupport;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -64,7 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan, Axios Engineering
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/FeaturePropertyAccessorFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/FeaturePropertyAccessorFactory.java $
  */
 public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
@@ -109,8 +111,8 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
                 && !ComplexType.class.isAssignableFrom(type)
                 && !AttributeDescriptor.class.isAssignableFrom(type))
             return null;
-
-        if ("".equals(xpath) && target == Geometry.class)
+        if("".equals(xpath))
+        //if ("".equals(xpath) && target == Geometry.class)
             return DEFAULT_GEOMETRY_ACCESS;
 
         // check for fid access
@@ -181,21 +183,28 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
             if (!"".equals(xpath))
                 return false;
 
-            if (target != Geometry.class || target != GeometryAttribute.class)
-                return false;
+            //if (target != Geometry.class || target != GeometryAttribute.class)
+            //    return false;
 
             return (object instanceof Feature || object instanceof FeatureType);
         }
 
         public Object get(Object object, String xpath, Class target) {
-            if (object instanceof Feature) {
-                return ((Feature) object).getDefaultGeometryProperty();
-            }
-            // no equivalent in geoapi-2.2?
-            //
-            // if (object instanceof FeatureType) {
-            // return ((FeatureType) object).getDefaultGeometry();
-            // }
+            if (object instanceof Feature)
+                return ((Feature) object).getDefaultGeometryProperty();            
+            if (object instanceof FeatureType) {
+                FeatureType ft = (FeatureType) object;
+                GeometryDescriptor gd = ft.getGeometryDescriptor();            
+                if ( gd == null ) {
+                    //look for any geometry descriptor
+                    for ( PropertyDescriptor pd : ft.getDescriptors() ) {
+                        if ( Geometry.class.isAssignableFrom( pd.getType().getBinding() ) ) {
+                            return pd;
+                        }
+                    }
+                }                
+                return gd;
+            }            
             return null;
         }
 

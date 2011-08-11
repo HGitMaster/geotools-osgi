@@ -23,7 +23,7 @@ import org.opengis.filter.Filter;
 
 /**
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/type/TextualAttributeType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/type/TextualAttributeType.java $
  */
 public class TextualAttributeType extends DefaultAttributeType implements PrimativeAttributeType {
     public TextualAttributeType(String name, boolean nillable, int min,

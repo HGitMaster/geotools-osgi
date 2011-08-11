@@ -37,16 +37,15 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.config.AppSchemaDataAccessConfigurator;
 import org.geotools.data.complex.config.AppSchemaDataAccessDTO;
-import org.geotools.data.complex.config.CatalogUtilities;
 import org.geotools.data.complex.config.EmfAppSchemaReader;
 import org.geotools.data.complex.config.FeatureTypeRegistry;
 import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.Types;
+import org.geotools.xml.SchemaIndex;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.geotools.xml.SchemaIndex;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
@@ -56,7 +55,7 @@ import org.opengis.feature.type.Name;
  * DOCUMENT ME!
  * 
  * @author Rob Atkinson
- * @version $Id: GeoSciMLTest.java 33542 2009-07-10 07:43:04Z ang05a $
+ * @version $Id: GeoSciMLTest.java 35576 2010-05-25 05:47:07Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
  *         /community-schema-ds/src/test/java/org/geotools/data/complex/BoreholeTest.java $
@@ -103,7 +102,7 @@ public class GeoSciMLTest {
      */
     private SchemaIndex loadSchema(String location) throws IOException {
         URL catalogLocation = getClass().getResource(schemaBase + "mappedPolygons.oasis.xml");
-        reader.setCatalog(CatalogUtilities.buildPrivateCatalog(catalogLocation));
+        reader.setResolver(catalogLocation);
         return reader.parse(new URL(location), null);
     }
 

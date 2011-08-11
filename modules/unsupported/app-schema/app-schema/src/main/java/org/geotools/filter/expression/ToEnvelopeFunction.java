@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Florence Tan, Curtin University of Technology
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/ToEnvelopeFunction.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/filter/expression/ToEnvelopeFunction.java $
  */
 public class ToEnvelopeFunction implements Function {
     private final List<Expression> parameters;

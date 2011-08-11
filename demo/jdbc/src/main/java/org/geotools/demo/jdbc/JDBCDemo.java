@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author Justin Deoliveira
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/jdbc/src/main/java/org/geotools/demo/jdbc/JDBCDemo.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/jdbc/src/main/java/org/geotools/demo/jdbc/JDBCDemo.java $
  */
 public class JDBCDemo {
 

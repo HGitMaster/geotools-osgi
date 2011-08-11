@@ -42,7 +42,7 @@ import org.geotools.util.Comparators;
  * more may slow down the execution.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TreeTileManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/TreeTileManager.java $
  * @version $Id: TreeTileManager.java 31341 2008-09-01 18:38:10Z desruisseaux $
  * @author Martin Desruisseaux
  */

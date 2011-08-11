@@ -29,7 +29,7 @@ import java.util.List;
  * want.
  *
  * @author Ian Schneider, USDA-ARS
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureTypeFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureTypeFactory.java $
  * @version $Id: DefaultFeatureTypeFactory.java 30647 2008-06-12 18:58:42Z acuster $
  */
 public class DefaultFeatureTypeFactory extends FeatureTypeFactory {

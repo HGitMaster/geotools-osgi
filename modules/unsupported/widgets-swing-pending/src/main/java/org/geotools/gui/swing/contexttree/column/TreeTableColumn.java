@@ -23,7 +23,7 @@ import org.jdesktop.swingx.table.TableColumnExt;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/TreeTableColumn.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/column/TreeTableColumn.java $
  */
 public abstract class TreeTableColumn extends TableColumnExt{
 

@@ -50,7 +50,7 @@ import org.geotools.factory.AbstractFactory;
  *
  * @author Rob Atkinson, Social Change Online
  * @author Chris Holmes, TOPP
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/BBOXDataStoreFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/geometryless/src/main/java/org/geotools/data/geometryless/BBOXDataStoreFactory.java $
  * @version $Id: BBOXDataStoreFactory.java 30692 2008-06-13 13:41:09Z acuster $
  */
 public class BBOXDataStoreFactory extends AbstractFactory 

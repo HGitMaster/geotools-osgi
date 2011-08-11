@@ -1,13 +1,1 @@
-org.geotools.util.CommonsConverterFactory
-org.geotools.util.NumericConverterFactory
-org.geotools.util.GeometryConverterFactory
-org.geotools.util.GeometryTypeConverterFactory
-org.geotools.util.TemporalConverterFactory
-org.geotools.util.BooleanConverterFactory
-org.geotools.util.ColorConverterFactory
-org.geotools.util.CollectionConverterFactory
-org.geotools.util.CharsetConverterFactory
-<<<<<<< local
-=======
 org.geotools.temporal.TemporalConverterFactory
->>>>>>> other

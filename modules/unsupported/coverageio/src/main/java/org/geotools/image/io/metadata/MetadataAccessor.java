@@ -83,7 +83,7 @@ import org.geotools.util.UnsupportedImplementationException;
  *
  * @since 2.4
  * @version $Id: MetadataAccessor.java 30965 2008-07-09 10:04:21Z cedricbr $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/MetadataAccessor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/MetadataAccessor.java $
  * @author Martin Desruisseaux
  * @author Cédric Briançon
  */

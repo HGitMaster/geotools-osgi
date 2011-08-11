@@ -26,7 +26,7 @@ import org.geotools.filter.Filter;
  * 
  * @author Justin
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisPermissionOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisPermissionOnlineTest.java $
  */
 public class PostgisPermissionOnlineTest extends PostgisOnlineTestCase {
 

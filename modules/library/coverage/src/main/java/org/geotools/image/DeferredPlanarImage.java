@@ -89,7 +89,7 @@ import org.geotools.util.logging.Logging;
  * </pre></blockquote>
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/DeferredPlanarImage.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/image/DeferredPlanarImage.java $
  * @version $Id: DeferredPlanarImage.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

@@ -36,7 +36,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * specified. The "0" should be understood as the <em>minimal</em> number of sources required.
  *
  * @since 2.1
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineDescriptor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/coverage/src/main/java/org/geotools/image/jai/CombineDescriptor.java $
  * @version $Id: CombineDescriptor.java 30643 2008-06-12 18:27:03Z acuster $
  * @author Remi Eve
  * @author Martin Desruisseaux (IRD)

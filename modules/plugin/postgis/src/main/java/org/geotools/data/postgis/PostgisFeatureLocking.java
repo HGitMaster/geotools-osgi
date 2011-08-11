@@ -55,7 +55,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research, Inc
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureLocking.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/PostgisFeatureLocking.java $
  * @version $Id: PostgisFeatureLocking.java 30669 2008-06-12 23:36:58Z acuster $
  */
 public class PostgisFeatureLocking extends PostgisFeatureStore

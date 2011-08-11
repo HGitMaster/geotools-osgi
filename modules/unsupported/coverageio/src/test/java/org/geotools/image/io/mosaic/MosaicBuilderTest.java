@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 /**
  * Tests {@link MosaicBuilder}.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/MosaicBuilderTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/test/java/org/geotools/image/io/mosaic/MosaicBuilderTest.java $
  * @version $Id: MosaicBuilderTest.java 31649 2008-10-12 17:56:37Z desruisseaux $
  * @author Martin Desruisseaux
  */

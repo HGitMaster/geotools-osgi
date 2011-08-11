@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +65,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @author Rini Angreani, Curtin University of Technology
- * @version $Id: AppSchemaDataAccess.java 34061 2009-10-05 06:31:55Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
+ * @version $Id: AppSchemaDataAccess.java 35224 2010-04-13 04:41:06Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/AppSchemaDataAccess.java $
  * @since 2.4
  */
 public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
@@ -85,12 +84,26 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * @param mappings
      *            a Set containing a {@linkplain FeatureTypeMapping} for each FeatureType this
      *            DataAccess is going to produce.
+     * @throws IOException
      */
-    public AppSchemaDataAccess(Set<FeatureTypeMapping> mappings) {
+    public AppSchemaDataAccess(Set<FeatureTypeMapping> mappings) throws IOException {
         this.mappings = new HashMap<Name, FeatureTypeMapping>();
         for (FeatureTypeMapping mapping : mappings) {
-            Name mappedElement = mapping.getTargetFeature().getName();
-            this.mappings.put(mappedElement, mapping);
+            Name name = mapping.getMappingName();
+            if (name == null) {
+                name = mapping.getTargetFeature().getName();
+            }
+            if (this.mappings.containsKey(name) || DataAccessRegistry.hasName(name)) {
+                // check both mappings and the registry, because the data access is
+                // only registered at the bottom of this constructor, so it might not
+                // be in the registry yet
+                throw new DataSourceException(
+                        "Duplicate mappingName or targetElement across FeatureTypeMapping instances detected.\n"
+                                + "They have to be unique, or app-schema doesn't know which one to get.\n"
+                                + "Please check your mapping file(s) with mappingName or targetElement of: "
+                                + name);
+            }
+            this.mappings.put(name, mapping);
             // if the type is not a feature, it should be wrapped with
             // a fake feature type, so attributes can be chained/nested
             AttributeType type = mapping.getTargetFeature().getType();
@@ -98,6 +111,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
                 type = new NonFeatureTypeProxy((ComplexType) type, mapping);
             }
         }
+        register();
     }
 
     /**
@@ -114,7 +128,11 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      */
     public Name[] getTypeNames() throws IOException {
         Name[] typeNames = new Name[mappings.size()];
-        this.mappings.keySet().toArray(typeNames);
+        int i = 0;
+        for (FeatureTypeMapping mapping : mappings.values()) {
+            typeNames[i] = mapping.getTargetFeature().getName();
+            i++;
+        }
         return typeNames;
     }
 
@@ -123,40 +141,74 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * list of FeatureType mappings and returns it.
      */
     public FeatureType getSchema(Name typeName) throws IOException {
-        return (FeatureType) getMapping(typeName).getTargetFeature().getType();
+        return (FeatureType) getMappingByElement(typeName).getTargetFeature().getType();
     }
 
     /**
-     * Returns the mapping suite for the given target type name.
+     * Returns the mapping suite for the given targetElement name or mappingName.
      * 
      * <p>
-     * Note this method is public just for unit testing pourposes
+     * Note this method is public just for unit testing purposes
      * </p>
      * 
      * @param typeName
      * @return
      * @throws IOException
      */
-    public FeatureTypeMapping getMapping(Name typeName) throws IOException {
+    public FeatureTypeMapping getMappingByName(Name typeName) throws IOException {
         FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings.get(typeName);
         if (mapping == null) {
-            StringBuffer availables = new StringBuffer("[");
-            for (Iterator<Name> it = mappings.keySet().iterator(); it.hasNext();) {
-                availables.append(it.next());
-                availables.append(it.hasNext() ? ", " : "");
-            }
-            availables.append("]");
-            throw new DataSourceException(typeName + " not found " + availables);
+            throw new DataSourceException(typeName + " not found. Available: "
+                    + mappings.keySet().toString());
         }
         return mapping;
     }
 
     /**
+     * Returns the mapping suite for the given target type name.
+     * 
+     * <p>
+     * Note this method is public just for unit testing purposes
+     * </p>
+     * 
      * @param typeName
-     * @return true if this data access contains mapping for provided type name
+     * @return
+     * @throws IOException
      */
-    public boolean hasMapping(Name typeName) {
-        return this.mappings.containsKey(typeName);
+    public FeatureTypeMapping getMappingByElement(Name typeName) throws IOException {
+        for (FeatureTypeMapping mapping : mappings.values()) {
+            if (mapping.getTargetFeature().getName().equals(typeName)) {
+                return mapping;
+            }
+        }
+        ArrayList<String> availables = new ArrayList<String>();
+        for (FeatureTypeMapping mapping : mappings.values()) {
+            availables.add(mapping.getTargetFeature().getName().toString());
+        }
+        throw new DataSourceException(typeName + " not found. Available: " + availables.toString());
+    }
+
+    /**
+     * @param name
+     *            mappingName or targetElement
+     * @return true if this data access contains mapping with for provided name
+     */
+    public boolean hasName(Name name) {
+        return this.mappings.containsKey(name);
+    }
+
+    /**
+     * @param typeName
+     *            targetElement name
+     * @return true if this data access contains mapping for provided targetElement name
+     */
+    public boolean hasElement(Name typeName) {
+        for (FeatureTypeMapping mapping : mappings.values()) {
+            if (mapping.getTargetFeature().getName().equals(typeName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -173,7 +225,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * @throws IOException
      */
     protected ReferencedEnvelope getBounds(Query query) throws IOException {
-        FeatureTypeMapping mapping = getMapping(getName(query));
+        FeatureTypeMapping mapping = getMappingByElement(getName(query));
         Query unmappedQuery = unrollQuery(query, mapping);
         return mapping.getSource().getBounds(unmappedQuery);
     }
@@ -196,7 +248,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      *             if there are errors getting the count
      */
     protected int getCount(final Query targetQuery) throws IOException {
-        final FeatureTypeMapping mapping = getMapping(getName(targetQuery));
+        final FeatureTypeMapping mapping = getMappingByElement(getName(targetQuery));
         final FeatureSource<FeatureType, Feature> mappedSource = mapping.getSource();
         Query unmappedQuery = unrollQuery(targetQuery, mapping);
         ((DefaultQuery) unmappedQuery).setMaxFeatures(targetQuery.getMaxFeatures());
@@ -351,9 +403,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      */
     public List<Name> getNames() {
         List<Name> names = new LinkedList<Name>();
-        for (FeatureTypeMapping mapping : mappings.values()) {
-            names.add(mapping.getTargetFeature().getName());
-        }
+        names.addAll(mappings.keySet());
         return names;
     }
 
@@ -372,7 +422,7 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
      * @see org.geotools.data.DataAccess#getFeatureSource(org.opengis.feature.type.Name)
      */
     public FeatureSource<FeatureType, Feature> getFeatureSource(Name typeName) throws IOException {
-        return new MappingFeatureSource(this, getMapping(typeName));
+        return new MappingFeatureSource(this, getMappingByElement(typeName));
     }
 
     /**
@@ -385,4 +435,18 @@ public class AppSchemaDataAccess implements DataAccess<FeatureType, Feature> {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Return a feature source that can be used to obtain features of a particular name. This name
+     * would be the mappingName in the TypeMapping if it exists, otherwise it's the target element
+     * name.
+     * 
+     * @param typeName
+     *            mappingName or targetElement
+     * @return Mapping feature source
+     * @throws IOException
+     */
+    public FeatureSource<FeatureType, Feature> getFeatureSourceByName(Name typeName)
+            throws IOException {
+        return new MappingFeatureSource(this, getMappingByName(typeName));
+    }
 }

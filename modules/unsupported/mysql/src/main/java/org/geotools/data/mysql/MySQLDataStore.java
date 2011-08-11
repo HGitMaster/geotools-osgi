@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Gary Sheppard garysheppard@psu.edu
  * @author Andrea Aime aaime@users.sourceforge.net
  * @author Debasish Sahu debasish.sahu@rmsi.com
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLDataStore.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/mysql/src/main/java/org/geotools/data/mysql/MySQLDataStore.java $
  */
 public class MySQLDataStore extends JDBCDataStore {
     /** The logger for the mysql module. */

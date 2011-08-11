@@ -24,7 +24,7 @@ import java.awt.Rectangle;
  * A tree node selected because of its inclusion in a Region Of Interest (ROI).
  * It contains an estimation of the cost of reading this tile and its children.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/SelectedNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/SelectedNode.java $
  * @version $Id: SelectedNode.java 30742 2008-06-16 19:48:45Z desruisseaux $
  * @author Martin Desruisseaux
  */

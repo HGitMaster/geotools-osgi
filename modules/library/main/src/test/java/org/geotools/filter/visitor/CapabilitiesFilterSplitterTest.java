@@ -23,10 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.geotools.filter.Capabilities;
-<<<<<<< local
-import org.geotools.filter.visitor.ClientTransactionAccessor;
-=======
->>>>>>> other
+
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.filter.Filter;
@@ -41,11 +38,8 @@ import org.opengis.filter.spatial.BBOX;
  * 
  * @author Jesse
  * @author ported from PostPreProcessFilterSplittingVisitor at 2.5.2 by Gabriel Roldan
-<<<<<<< local
-=======
  *
  * @source $URL: http://svn.osgeo.org/geotools/trunk/modules/library/main/src/test/java/org/geotools/filter/visitor/CapabilitiesFilterSplitterTest.java $
->>>>>>> other
  */
 @SuppressWarnings( { "nls", "unchecked" })
 public class CapabilitiesFilterSplitterTest extends AbstractCapabilitiesFilterSplitterTests {
@@ -341,8 +335,6 @@ public class CapabilitiesFilterSplitterTest extends AbstractCapabilitiesFilterSp
         assertEquals(ff.or(f, ff.id(ids)), visitor.getFilterPre());
     }
 
-<<<<<<< local
-=======
     @Test
     public void testTemporalFilter() {
         visitor = new CapabilitiesFilterSplitter(simpleLogicalCaps, null, null);
@@ -360,5 +352,4 @@ public class CapabilitiesFilterSplitterTest extends AbstractCapabilitiesFilterSp
         assertEquals(f2, visitor.getFilterPre());
         assertEquals(f1, visitor.getFilterPost());
     }
->>>>>>> other
 }

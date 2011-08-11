@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>ogc</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
   <groupId>org.geotools.ogc</groupId>
@@ -31,8 +31,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>net.java.dev.jsr-275</groupId>
-      <artifactId>jsr-275</artifactId>
+      <groupId>net.java.dev.osgi</groupId>
+      <artifactId>net.java.dev.osgi.jsr275</artifactId>
     </dependency>    
   </dependencies>
 

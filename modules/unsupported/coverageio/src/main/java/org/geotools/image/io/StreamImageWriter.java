@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * handled.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageWriter.java $
  * @version $Id: StreamImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */
@@ -218,7 +218,7 @@ public abstract class StreamImageWriter extends GeographicImageWriter {
      * Service provider interface (SPI) for {@link StreamImageWriter}s.
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageWriter.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/StreamImageWriter.java $
      * @version $Id: StreamImageWriter.java 30679 2008-06-13 10:19:41Z acuster $
      * @author Martin Desruisseaux (IRD)
      */

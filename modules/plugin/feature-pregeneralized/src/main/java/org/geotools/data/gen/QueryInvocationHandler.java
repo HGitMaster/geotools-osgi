@@ -31,7 +31,7 @@ import org.geotools.data.Query;
  * other query data unchanged
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/QueryInvocationHandler.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/feature-pregeneralized/src/main/java/org/geotools/data/gen/QueryInvocationHandler.java $
  */
 public class QueryInvocationHandler implements InvocationHandler {
 

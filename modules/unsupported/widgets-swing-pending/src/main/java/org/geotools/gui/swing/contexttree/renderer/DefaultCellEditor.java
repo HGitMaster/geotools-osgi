@@ -27,7 +27,7 @@ import javax.swing.table.TableCellEditor;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/DefaultCellEditor.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/contexttree/renderer/DefaultCellEditor.java $
  */
 public class DefaultCellEditor extends AbstractCellEditor implements TableCellEditor{
 

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: EPSG Authority Factory via HSQL Database
+Bundle-SymbolicName: org.geotools.epsg.hsql
+Bundle-Version: 2.6.5.osgi2
+Bundle-Vendor: Harman/Becker
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Eclipse-RegisterBuddy: org.geotools.metadata
+Require-Bundle: org.geotools.referencing;bundle-version="2.6.0",
+ org.geotools.metadata;bundle-version="2.6.0",
+ com.springsource.org.hsqldb;bundle-version="1.8.0",
+ org.opengis.geoapi;bundle-version="2.2.0"
+Import-Package: javax.measure.unit

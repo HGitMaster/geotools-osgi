@@ -30,7 +30,7 @@ import junit.framework.TestCase;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/config/PropertyInterpolationUtilsTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/config/PropertyInterpolationUtilsTest.java $
  */
 public class PropertyInterpolationUtilsTest extends TestCase {
 

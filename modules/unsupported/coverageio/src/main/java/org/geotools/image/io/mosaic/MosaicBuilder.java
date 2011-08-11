@@ -54,7 +54,7 @@ import org.opengis.referencing.datum.PixelInCell;
  * builder can also write the tiles to disk from an initially untiled image.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicBuilder.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicBuilder.java $
  * @version $Id: MosaicBuilder.java 33009 2009-05-14 19:40:06Z simonegiannecchini $
  * @author Cédric Briançon
  * @author Martin Desruisseaux

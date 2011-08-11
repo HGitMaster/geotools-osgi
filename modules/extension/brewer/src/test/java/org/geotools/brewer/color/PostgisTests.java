@@ -25,7 +25,7 @@ import java.util.PropertyResourceBundle;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/extension/brewer/src/test/java/org/geotools/brewer/color/PostgisTests.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/extension/brewer/src/test/java/org/geotools/brewer/color/PostgisTests.java $
  */
 public class PostgisTests {
     public static Fixture newFixture(String props) throws IOException {

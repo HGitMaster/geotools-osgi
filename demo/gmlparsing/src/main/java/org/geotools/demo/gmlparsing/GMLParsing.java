@@ -42,7 +42,7 @@ import org.w3c.dom.Document;
  * @author Justin Deoliveira, OpenGeo
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/gmlparsing/src/main/java/org/geotools/demo/gmlparsing/GMLParsing.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/gmlparsing/src/main/java/org/geotools/demo/gmlparsing/GMLParsing.java $
  */
 public class GMLParsing {
 

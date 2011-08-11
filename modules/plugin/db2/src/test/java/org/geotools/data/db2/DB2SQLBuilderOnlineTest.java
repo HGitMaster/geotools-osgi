@@ -57,8 +57,8 @@ public class DB2SQLBuilderOnlineTest extends AbstractDB2OnlineTestCase {
 	 * 
 	 * @throws Exception
 	 */
-	public void setUp() throws Exception {
-		super.setUp();
+	public void connect() throws Exception {
+		super.connect();
 		this.dataStore = getDataStore();
 
 		SQLEncoderDB2 encoder = new SQLEncoderDB2();

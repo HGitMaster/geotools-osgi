@@ -27,7 +27,7 @@ import javax.swing.JTree;
  * with a custom label.
  *
  * @since 2.0
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/tree/NamedTreeNode.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/tree/NamedTreeNode.java $
  * @version $Id: NamedTreeNode.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  */

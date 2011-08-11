@@ -33,10 +33,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author jeichar
  * @author dblasby
- * @author simone giannecchini  * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
+ * @author simone giannecchini  * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
  * @deprecated Use {@link LabelCacheItem} instead (along with {@link LabelCacheImpl}
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/render/src/main/java/org/geotools/renderer/lite/LabelCacheItem.java $
  */
 public class LabelCacheItem implements Comparable<LabelCacheItem> {
 	TextStyle2D textStyle;

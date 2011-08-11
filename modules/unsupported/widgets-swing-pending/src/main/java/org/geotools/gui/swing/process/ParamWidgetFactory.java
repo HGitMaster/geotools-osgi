@@ -22,7 +22,7 @@ package org.geotools.gui.swing.process;
  * 
  * @author Graham Davis
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ParamWidgetFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/ParamWidgetFactory.java $
  */
 public class ParamWidgetFactory {
 

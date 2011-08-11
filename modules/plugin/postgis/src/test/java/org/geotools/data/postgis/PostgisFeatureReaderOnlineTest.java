@@ -32,7 +32,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * 
  * @author Cory Horner, Refractions Research 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisFeatureReaderOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/test/java/org/geotools/data/postgis/PostgisFeatureReaderOnlineTest.java $
  */
 public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCase {
 

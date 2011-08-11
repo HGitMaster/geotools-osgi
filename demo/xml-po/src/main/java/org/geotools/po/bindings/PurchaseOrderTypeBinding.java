@@ -44,7 +44,7 @@ import javax.xml.namespace.QName;
  *
  * @generated
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/demo/xml-po/src/main/java/org/geotools/po/bindings/PurchaseOrderTypeBinding.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/demo/xml-po/src/main/java/org/geotools/po/bindings/PurchaseOrderTypeBinding.java $
  */
 public class PurchaseOrderTypeBinding extends AbstractComplexBinding {
 

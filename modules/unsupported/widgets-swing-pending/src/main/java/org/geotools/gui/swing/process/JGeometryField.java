@@ -38,7 +38,7 @@ import com.vividsolutions.jts.io.WKTWriter;
 /**
  *  Text field for filling in a Geometry parameter.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JGeometryField.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/process/JGeometryField.java $
  */
 public class JGeometryField extends AbstractParamWidget {
     private JTextArea text;

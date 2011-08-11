@@ -35,7 +35,7 @@ import java.util.logging.Level;
  *
  * @author Andrea Aime
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/PostgisFIDMapperFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/postgis/src/main/java/org/geotools/data/postgis/fidmapper/PostgisFIDMapperFactory.java $
  */
 public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     JDBCDataStoreConfig config;
@@ -114,10 +114,11 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
         if (ci.isAutoIncrement()) {
             return new PostGISAutoIncrementFIDMapper(schema, tableName,
                 ci.getColName(), ci.getDataType());
+        } else if("uuid".equals(ci.getTypeName())) {
+            return new UUIDFIDMapper(ci.getColName(), ci.dataType);
         }
 
-        return super.buildSingleColumnFidMapper(schema, tableName, connection,
-            ci);
+        return super.buildSingleColumnFidMapper(schema, tableName, connection, ci);
     }
 
     /**

@@ -48,7 +48,7 @@ import org.opengis.util.InternationalString;
 
 /**
  * @author jeichar
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/referencing/JDBCAuthorityFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/referencing/JDBCAuthorityFactory.java $
  */
 public class JDBCAuthorityFactory implements CRSAuthorityFactory {
 

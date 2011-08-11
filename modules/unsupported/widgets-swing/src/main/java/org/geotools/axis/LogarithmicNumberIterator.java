@@ -25,7 +25,7 @@ import org.geotools.resources.XMath;
  * Cet itérateur retourne les positions des graduations à partir de la valeur minimale
  * jusqu'à la valeur maximale.
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/LogarithmicNumberIterator.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/axis/LogarithmicNumberIterator.java $
  * @version $Id: LogarithmicNumberIterator.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (PMO, IRD)
  */

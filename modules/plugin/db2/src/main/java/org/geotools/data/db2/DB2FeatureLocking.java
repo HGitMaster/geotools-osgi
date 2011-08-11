@@ -31,7 +31,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author davea To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  *         Comments
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureLocking.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureLocking.java $
  */
 public class DB2FeatureLocking extends DB2FeatureStore {
     /**

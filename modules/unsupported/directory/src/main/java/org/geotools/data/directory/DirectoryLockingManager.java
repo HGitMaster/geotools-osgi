@@ -30,7 +30,7 @@ import org.geotools.data.Transaction;
  * @author Andrea Aime - OpenGeo
  *
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/directory/src/main/java/org/geotools/data/directory/DirectoryLockingManager.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/directory/src/main/java/org/geotools/data/directory/DirectoryLockingManager.java $
  */
 public class DirectoryLockingManager implements LockingManager {
     

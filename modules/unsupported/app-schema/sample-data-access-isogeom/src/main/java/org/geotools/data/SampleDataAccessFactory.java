@@ -36,7 +36,7 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
  * @version $Id: SampleDataAccessFactory.java 32071 2008-12-24 03:03:33Z bencaradocdavies $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/sample-data-access-isogeom/src/main/java/org/geotools/data/SampleDataAccessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/sample-data-access-isogeom/src/main/java/org/geotools/data/SampleDataAccessFactory.java $
  * @since 2.6
  */
 public class SampleDataAccessFactory implements DataAccessFactory {

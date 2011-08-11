@@ -27,7 +27,7 @@ import org.geotools.gui.swing.propertyedit.PropertyPane;
  * 
  * @author  Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/GeometryPanel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/propertyedit/model/GeometryPanel.java $
  */
 public class GeometryPanel extends javax.swing.JPanel implements PropertyPane {
     

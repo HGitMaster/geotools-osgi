@@ -23,6 +23,7 @@ import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.NodePointerFactory;
 import org.opengis.feature.Attribute;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.AttributeType;
 
 /**
@@ -39,7 +40,7 @@ import org.opengis.feature.type.AttributeType;
  * @author Gabriel Roldan, Axios Engineering
  * 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeNodePointerFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/feature/xpath/AttributeNodePointerFactory.java $
  */
 public class AttributeNodePointerFactory implements NodePointerFactory {
 
@@ -48,8 +49,12 @@ public class AttributeNodePointerFactory implements NodePointerFactory {
     }
 
     public NodePointer createNodePointer(QName name, Object object, Locale locale) {
-
-        if (object instanceof Attribute) {
+        
+        /*
+         * Do not handle SimpleFeature, which should be handled by FeatureNodeFactory, registered by
+         * XPathPropertyAccessorFactory in gt-xsd-core. See GEOS-3525.
+         */
+        if (object instanceof Attribute && !(object instanceof SimpleFeature)) {
             return new AttributeNodePointer(null, (Attribute) object, name);
         }
 
@@ -63,7 +68,11 @@ public class AttributeNodePointerFactory implements NodePointerFactory {
 
     public NodePointer createNodePointer(NodePointer parent, QName name, Object object) {
 
-        if (object instanceof Attribute) {
+        /*
+         * Do not handle SimpleFeature, which should be handled by FeatureNodeFactory, registered by
+         * XPathPropertyAccessorFactory in gt-xsd-core. See GEOS-3525.
+         */
+        if (object instanceof Attribute && !(object instanceof SimpleFeature)) {
             return new AttributeNodePointer(parent, (Attribute) object, name);
         }
 

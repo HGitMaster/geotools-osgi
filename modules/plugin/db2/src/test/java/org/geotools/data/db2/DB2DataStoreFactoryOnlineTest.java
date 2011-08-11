@@ -26,17 +26,17 @@ import org.geotools.data.DataAccessFactory.Param;
  * Exercise DB2DataStoreFactory.
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2DataStoreFactoryOnlineTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/test/java/org/geotools/data/db2/DB2DataStoreFactoryOnlineTest.java $
  */
 public class DB2DataStoreFactoryOnlineTest extends AbstractDB2OnlineTestCase {
     DB2DataStoreFactory factory = new DB2DataStoreFactory();
 
-    public void setUp() throws Exception {
-        super.setUp();
+    public void connect() throws Exception {
+        super.connect();
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    protected void disconnect() throws Exception {
+        super.disconnect();
     }
 
     public void testIsAvailable() {

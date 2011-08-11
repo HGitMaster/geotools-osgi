@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  * same entity both the process and the factory.
  * The process is supposed to take a bean as a parameter and return a bean as a result. 
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/process/src/main/java/org/geotools/process/impl/BeanProcessFactory.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/process/src/main/java/org/geotools/process/impl/BeanProcessFactory.java $
  */
 public abstract class BeanProcessFactory implements ProcessFactory {
     

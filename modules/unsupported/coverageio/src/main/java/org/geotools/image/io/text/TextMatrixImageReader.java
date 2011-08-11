@@ -49,7 +49,7 @@ import org.geotools.image.io.metadata.GeographicMetadata;
  * the {@link #getRawDataType} method.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageReader.java $
  * @version $Id: TextMatrixImageReader.java 30679 2008-06-13 10:19:41Z acuster $
  * @author Martin Desruisseaux (IRD)
  */
@@ -374,7 +374,7 @@ public class TextMatrixImageReader extends TextImageReader {
      * and {@code Spi}.
      *
      * @since 2.1
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageReader.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextMatrixImageReader.java $
      * @version $Id: TextMatrixImageReader.java 30679 2008-06-13 10:19:41Z acuster $
      * @author Martin Desruisseaux (IRD)
      */

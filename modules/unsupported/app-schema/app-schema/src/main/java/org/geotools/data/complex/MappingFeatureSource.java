@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -57,8 +58,8 @@ import org.opengis.filter.Filter;
  * 
  * @author Gabriel Roldan, Axios Engineering
  * @author Ben Caradoc-Davies, CSIRO Exploration and Mining
- * @version $Id: MappingFeatureSource.java 34495 2009-11-25 12:24:06Z ang05a $
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
+ * @version $Id: MappingFeatureSource.java 34998 2010-03-10 08:51:59Z ang05a $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/main/java/org/geotools/data/complex/MappingFeatureSource.java $
  * @since 2.4
  */
 class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
@@ -135,6 +136,10 @@ class MappingFeatureSource implements FeatureSource<FeatureType, Feature> {
 
     public FeatureType getSchema() {
         return (FeatureType) mapping.getTargetFeature().getType();
+    }
+    
+    public AttributeDescriptor getTargetFeature() {
+        return mapping.getTargetFeature();
     }
 
     protected FeatureTypeMapping getMapping() {

@@ -32,7 +32,7 @@ import org.opengis.feature.type.PropertyDescriptor;
  * 
  * @author Johann Sorel
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JGeomBox.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing-pending/src/main/java/org/geotools/gui/swing/style/sld/JGeomBox.java $
  */
 public class JGeomBox extends JComboBox {
 

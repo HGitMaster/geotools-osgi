@@ -35,7 +35,7 @@ import javax.swing.table.AbstractTableModel;
  * underlying {@link RenderedImage} is serializable.
  *
  * @since 2.3
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ImageTableModel.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/widgets-swing/src/main/java/org/geotools/gui/swing/image/ImageTableModel.java $
  * @version $Id: ImageTableModel.java 30655 2008-06-12 20:24:25Z acuster $
  * @author Martin Desruisseaux (IRD)
  *

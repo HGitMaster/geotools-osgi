@@ -32,7 +32,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Mehdi Sidhoum (Geomatys)
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/temporal/src/test/java/org/geotools/temporal/reference/DefaultOrdinalEraTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/temporal/src/test/java/org/geotools/temporal/reference/DefaultOrdinalEraTest.java $
  */
 public class DefaultOrdinalEraTest {
 

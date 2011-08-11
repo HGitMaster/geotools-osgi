@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 /**
  * @author Russell Petty, GSV
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AttributeCreateOrderListTest.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/app-schema/app-schema/src/test/java/org/geotools/data/complex/AttributeCreateOrderListTest.java $
  */
 public class AttributeCreateOrderListTest extends TestCase {
   

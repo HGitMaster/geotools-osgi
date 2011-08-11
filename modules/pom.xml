@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>geotools</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
   
 
@@ -46,7 +46,7 @@
   <dependencies>
     <dependency>
       <groupId>javax.media</groupId>
-      <artifactId>jai_core</artifactId>
+      <artifactId>javax.media.jai.osgi</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>provided</scope>  <!-- Users should execute JAI installer. -->
     </dependency>

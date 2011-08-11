@@ -30,7 +30,7 @@ import org.opengis.feature.simple.SimpleFeature;
  *
  * @author David Adler - IBM Corporation
  *
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2AutoIncrementFIDMapper.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2AutoIncrementFIDMapper.java $
  */
 public class DB2AutoIncrementFIDMapper extends AutoIncrementFIDMapper {
 

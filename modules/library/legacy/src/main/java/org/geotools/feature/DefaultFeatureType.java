@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  * A basic implementation of FeatureType.
  *
  * @author Ian Schneider
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureType.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/library/legacy/src/main/java/org/geotools/feature/DefaultFeatureType.java $
  * @version $Id: DefaultFeatureType.java 30921 2008-07-05 07:51:23Z jgarnett $
  */
 public class DefaultFeatureType extends SimpleFeatureTypeImpl implements FeatureType {

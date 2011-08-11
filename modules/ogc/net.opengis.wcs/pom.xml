@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>ogc</artifactId>
-    <version>8.0-M1</version>
+    <version>8.0.0.M1osgi1</version>
   </parent>
 
   <groupId>org.geotools.ogc</groupId>
@@ -41,8 +41,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
+      <groupId>com.vividsolutions.osgi</groupId>
+      <artifactId>com.vividsolutions.osgi.jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>

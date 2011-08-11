@@ -23,8 +23,11 @@ import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.apache.xml.resolver.Catalog;
 import org.geotools.gml3.ApplicationSchemaConfiguration;
+import org.geotools.gml3.GMLConfiguration;
+import org.geotools.xml.AppSchemaCatalog;
+import org.geotools.xml.AppSchemaConfiguration;
+import org.geotools.xml.AppSchemaResolver;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.SchemaIndex;
@@ -48,7 +51,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * </p>
  * 
  * @author Gabriel Roldan
- * @version $Id: EmfAppSchemaReader.java 33540 2009-07-10 06:58:21Z groldan $
+ * @version $Id: EmfAppSchemaReader.java 35576 2010-05-25 05:47:07Z bencaradocdavies $
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/2.4.x/modules/unsupported/community-schemas
  *         /community
@@ -59,18 +62,32 @@ public class EmfAppSchemaReader {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(EmfAppSchemaReader.class.getPackage().getName());
 
-    private Catalog oasisCatalog;
+    /**
+     * The initial resolver has support for only file and classpath resolution. Anything more than a
+     * test should probably set this to something more useful.
+     */
+    private AppSchemaResolver resolver = new AppSchemaResolver();
 
     private EmfAppSchemaReader() {
         // do nothing
     }
 
-    public Catalog getCatalog() {
-        return oasisCatalog;
+    public AppSchemaResolver getResolver() {
+        return resolver;
     }
 
-    public void setCatalog(final Catalog oasisCatalog) {
-        this.oasisCatalog = oasisCatalog;
+    public void setResolver(AppSchemaResolver resolver) {
+        this.resolver = resolver;
+    }
+
+    /**
+     * Set resolver based on catalog. Use this for testing only, because it does not support cached
+     * downloads.
+     * 
+     * @param catalogLocation
+     */
+    public void setResolver(URL catalogLocation) {
+        this.resolver = new AppSchemaResolver(AppSchemaCatalog.build(catalogLocation));
     }
 
     /**
@@ -113,12 +130,13 @@ public class EmfAppSchemaReader {
             resolvedSchemaLocations.put(nameSpace, schemaLocation);
         }
 
-        // if there's an Oasis catalog set, use it to resolve schema locations
-        // (can be null)
-        final Catalog catalog = getCatalog();
-
-        final Configuration configuration = new CatalogApplicationSchemaConfiguration(nameSpace,
-                schemaLocation, catalog);
+        /*
+         * FIXME: This hardcoded GML 3.1 dependency will have to change when GML 3.2 support is
+         * added. The solution is probably to resolve the schema and look at the namespaces to see
+         * whether it is a GML 3.1 or 3.2 schema.
+         */
+        final Configuration configuration = new AppSchemaConfiguration(nameSpace, schemaLocation,
+                resolver, new GMLConfiguration());
 
         return parse(configuration);
     }
@@ -134,13 +152,8 @@ public class EmfAppSchemaReader {
         String targetNamespace = null;
         // parse some of the instance document to find out the
         // schema location
-        if (getCatalog() != null) {
-            String resolvedLocation = getCatalog().resolveURI(location.toExternalForm());
-            if (resolvedLocation != null) {
-                location = new URL(resolvedLocation);
-            }
-        }
-        InputStream input = location.openStream();
+        URL resolvedLocation = new URL(resolver.resolve(location.toExternalForm()));
+        InputStream input = resolvedLocation.openStream();
 
         // create stream parser
         XmlPullParser parser = null;
@@ -165,7 +178,7 @@ public class EmfAppSchemaReader {
             // reset input stream
             parser.setInput(null);
         } catch (XmlPullParserException e) {
-            String msg = "Cannot find target namespace for schema document " + location;
+            String msg = "Cannot find target namespace for schema document " + resolvedLocation;
             throw (RuntimeException) new RuntimeException(msg).initCause(e);
         } finally {
             input.close();

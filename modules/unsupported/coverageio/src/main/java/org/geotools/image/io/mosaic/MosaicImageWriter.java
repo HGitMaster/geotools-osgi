@@ -65,7 +65,7 @@ import org.geotools.util.logging.Logging;
  * images to mosaic are typically bigger than {@link RenderedImage} capacity.
  *
  * @since 2.5
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriter.java $
  * @version $Id: MosaicImageWriter.java 31445 2008-09-07 18:14:23Z desruisseaux $
  * @author Cédric Briançon
  * @author Martin Desruisseaux
@@ -1093,7 +1093,7 @@ search: for (final Tile tile : tiles) {
      * Service provider for {@link MosaicImageWriter}.
      *
      * @since 2.5
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriter.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/mosaic/MosaicImageWriter.java $
      * @version $Id: MosaicImageWriter.java 31445 2008-09-07 18:14:23Z desruisseaux $
      * @author Cédric Briançon
      * @author Martin Desruisseaux

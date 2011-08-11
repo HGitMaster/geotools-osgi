@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * A list of child elements, for example {@code <SampleDimensions>} or {@code <Axis>}.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ChildList.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/metadata/ChildList.java $
  * @version $Id: ChildList.java 30996 2008-07-10 13:28:59Z cedricbr $
  * @author Martin Desruisseaux
  * @author Cédric Briançon

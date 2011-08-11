@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DOCUMENT ME!
  *
  * @author David Adler - IBM Corporation
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureWriter.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/plugin/db2/src/main/java/org/geotools/data/db2/DB2FeatureWriter.java $
  */
 public class DB2FeatureWriter extends JDBCTextFeatureWriter {
 	private DB2SQLBuilder sqlBuilder;

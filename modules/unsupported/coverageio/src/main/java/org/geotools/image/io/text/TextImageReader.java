@@ -44,7 +44,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * method.
  *
  * @since 2.4
- * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
+ * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
  * @version $Id: TextImageReader.java 33694 2009-08-06 13:23:57Z aaime $
  * @author Martin Desruisseaux (IRD)
  */
@@ -320,7 +320,7 @@ public abstract class TextImageReader extends StreamImageReader {
      * </pre></blockquote>
      *
      * @since 2.4
-     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.2/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
+     * @source $URL: http://svn.osgeo.org/geotools/tags/2.6.5/modules/unsupported/coverageio/src/main/java/org/geotools/image/io/text/TextImageReader.java $
      * @version $Id: TextImageReader.java 33694 2009-08-06 13:23:57Z aaime $
      * @author Martin Desruisseaux (IRD)
      */
