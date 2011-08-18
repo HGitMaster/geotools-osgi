@@ -1,8 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/main/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+  <classpathentry kind="lib" path="gt-coverage-8.0.0.M1osgi1.jar"/>
+  <classpathentry kind="lib" path="gt-cql-8.0.0.M1osgi1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-sample-data/8.0.0.M1osgi1/gt-sample-data-8.0.0.M1osgi1.jar" sourcepath="M2_REPO/org/geotools/gt-sample-data/8.0.0.M1osgi1/gt-sample-data-8.0.0.M1osgi1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-shapefile/8.0.0.M1osgi1/gt-shapefile-8.0.0.M1osgi1.jar"/>
+  <classpathentry kind="lib" path="imageio-ext-tiff-1.1.0.jar" sourcepath="C:\Users\SBorodavkin\.m2\repository\it\geosolutions\imageio-ext\imageio-ext-tiff\1.1.0\imageio-ext-tiff-1.1.0-sources.jar"/>
+  <classpathentry kind="lib" path="imageio-ext-utilities-1.1.0.jar" sourcepath="C:\Users\SBorodavkin\.m2\repository\it\geosolutions\imageio-ext\imageio-ext-utilities\1.1.0\imageio-ext-utilities-1.1.0-sources.jar"/>
+  <classpathentry kind="lib" path="jai_codec-1.1.3.jar"/>
+  <classpathentry kind="lib" path="jai_core-1.1.3.jar"/>
+  <classpathentry kind="lib" path="jai_imageio-1.1.jar"/>
+  <classpathentry kind="lib" path="jdom-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.4/junit-4.4.jar" sourcepath="M2_REPO/junit/junit/4.4/junit-4.4-sources.jar"/>
 </classpath>

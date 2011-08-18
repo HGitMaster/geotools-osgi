@@ -106,11 +106,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>it.geosolutions.imageio-ext</groupId>
-  	  <artifactId>de.berlios.it.geosolutions.imageio.ext.customstreams</artifactId>
-      <!-- The version number is specified in the parent POM. -->      
-    </dependency>  
-    <dependency>
       <groupId>javax.media.jai.osgi</groupId>
       <artifactId>javax.media.jai.osgi.jai_imageio</artifactId>
       <!-- The version number is specified in the parent POM. -->

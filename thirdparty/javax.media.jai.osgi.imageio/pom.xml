@@ -47,7 +47,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <_include>META-INF/headers.txt</_include>
             <Embed-Dependency>jai_imageio;inline=true,jiio_clib;inline=true</Embed-Dependency>
             <Bundle-SymbolicName>javax.media.jai.osgi.jai_imageio</Bundle-SymbolicName>
             <Bundle-Activator>org.geotools.thirdparty.jai.imageio.Activator</Bundle-Activator>

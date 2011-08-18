@@ -801,8 +801,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore implements
             URL treeURL = shpFiles.acquireRead(QIX, this);
             try {
                 File treeFile = DataUtilities.urlToFile(treeURL);
-
-                if (treeFile.exists() && treeFile.length() < 1024 * maxQixCacheSize) {
+                
+                if (treeFile != null && treeFile.exists() && treeFile.length() < 1024 * maxQixCacheSize) {
                     canCache = true;
                 }
             } finally {

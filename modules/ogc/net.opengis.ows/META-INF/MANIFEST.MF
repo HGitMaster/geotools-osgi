@@ -1,10 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
-Bundle-SymbolicName: net.opengis.ows; singleton:=true
-Bundle-Version: 1.0.0
-Bundle-ClassPath: .
-Bundle-Vendor: %providerName
+Bundle-Name: Open Web Services Model
+Bundle-SymbolicName: net.opengis.ows;singleton:=true
+Bundle-Version: 8.0.0.M1osgi1
+Bundle-Vendor: Geotools
 Bundle-Localization: plugin
 Export-Package: net.opengis.ows10,
  net.opengis.ows10.impl,
@@ -14,3 +13,5 @@ Export-Package: net.opengis.ows10,
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport
 Eclipse-LazyStart: true
+Bundle-ClassPath: .,
+ org.w3.xlink-8.0.0.M1osgi1.jar

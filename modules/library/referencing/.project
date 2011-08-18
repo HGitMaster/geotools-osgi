@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.geotools.referencing</name>
-	<comment></comment>
+	<name>gt-referencing</name>
+	<comment>Contains implementations of Coordinate Reference Systems (CRS),
+    conversion and transformation services.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,9 +21,28 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.iam.jdt.core.mavenIncrementalBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.iam.jdt.core.mavenNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>jai_mlib-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_mlib/1.1.3/jai_mlib-1.1.3.jar</location>
+		</link>
+	</linkedResources>
 </projectDescription>

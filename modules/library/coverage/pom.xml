@@ -141,7 +141,7 @@
     </dependency>
     <dependency>
       <groupId>it.geosolutions.imageio-ext</groupId>
-  	  <artifactId>imageio-ext-tiff</artifactId>
+      <artifactId>de.berlios.it.geosolutions.imageio.ext.tiff</artifactId>
       <!-- The version number is specified in the parent POM. -->      
     </dependency>    
     
@@ -153,9 +153,8 @@
      <dependency>
        <groupId>org.jaitools.osgi</groupId>
        <artifactId>org.jaitools.osgi.jt-utils</artifactId>
-     </dependency>
-    
-    </dependency>
+     </dependency>    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.geotools</groupId>

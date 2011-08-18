@@ -33,9 +33,9 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>net.java.dev.osgi.jsr275</module>
     <module>de.berlios.com.miglayout</module>
     <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
-    <module>de.berlios.it.geosolutions.imageio.ext.customstreams</module>
     <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>    
     <module>de.berlios.org.apache.commons.cli2</module>
     <module>javax.media.jai.osgi</module>
@@ -46,6 +46,7 @@
     <module>java3d.osgi</module>
     <module>com.vividsolutions.osgi.jts</module>
     <module>org.jaitools.osgi.jt-utils</module>
+    <module>org.jaitools.osgi.jt-vectorbinarize</module>
     <module>org.jaitools.osgi.jt-zonalstats</module>
     <module>org.apache.batik.osgi.transcoder</module>
     <module>com.springsource.org.apache.batik.dom</module>

@@ -101,35 +101,16 @@
   <dependencies>
     <!-- NOTE: The metadata module does not depend on JTS. -->
     <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-opengis</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>java3d.osgi</groupId>
       <artifactId>java3d.osgi.vecmath</artifactId>
        <!-- The version number is specified in the parent POM. -->
     </dependency>
-
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.opengis</groupId>
-          <artifactId>geoapi-dummy-pending</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-pending</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-
-    <dependency>
-      <groupId>net.java.dev.osgi</groupId>
-      <artifactId>net.java.dev.osgi.jsr275</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-
-
 
     <!--
       The following is required only for compilation.  It should not be included
@@ -195,9 +176,7 @@
         </configuration>
       </plugin>
       </plugins>
-   </build>
-
-  <build>
+      
     <resources>
       <resource>
         <directory>${basedir}/src/main/resources</directory>

@@ -25,7 +25,7 @@
     <!-- =========================================================== -->
     <groupId>org.geotools.maven</groupId>
     <artifactId>javadoc</artifactId>
-    <packaging>jar</packaging>
+    <packaging>maven-plugin</packaging>
     <name>Cross-modules javadoc</name>
     <description>
     Defines custom taglet for 'source' and 'tutorial' javadoc tags and for the 
@@ -68,6 +68,7 @@
         </developer>
     </developers>
 
+    <!-- SBorodavkin: exec-maven-plugin can't be found 
     <build>
         <plugins>
             <plugin>
@@ -86,7 +87,7 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build> -->
 
 
 

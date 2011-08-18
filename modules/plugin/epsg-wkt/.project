@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.geotools.epsg.wkt</name>
-	<comment></comment>
+	<name>gt-epsg-wkt</name>
+	<comment>EPSG and AUTO authority factories are defined for data.crs.CRSService.
+    These codes are used to provide CoordinateRegerenceSystem for GCE and
+    DataStore implementations that do not define their own native definition.
+  
+    Contains a Property file based CoordinateSystemAuthority (the property file 
+    is too large to be included in the main geotools release). This class will 
+    need to be ported to the new GeoAPI CoordinateReferenceSystem interfaces.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,9 +26,21 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.iam.jdt.core.mavenIncrementalBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.iam.jdt.core.mavenNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
 </projectDescription>

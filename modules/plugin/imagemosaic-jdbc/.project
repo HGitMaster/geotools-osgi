@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.geotools.imagemosaic.jdbc</name>
-	<comment></comment>
+	<name>gt-imagemosaic-jdbc</name>
+	<comment>Plugin for reading tiled images from a JDBC Data Source</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,9 +20,72 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>gt-coverage-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi1/gt-coverage-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-epsg-hsql-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-epsg-hsql/8.0.0.M1osgi1/gt-epsg-hsql-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-jdbc-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi1/gt-jdbc-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-shapefile-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-shapefile/8.0.0.M1osgi1/gt-shapefile-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-tiff-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-tiff/1.1.0/imageio-ext-tiff-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-utilities-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-utilities/1.1.0/imageio-ext-utilities-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>jai_codec-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_codec/1.1.3/jai_codec-1.1.3.jar</location>
+		</link>
+		<link>
+			<name>jai_core-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar</location>
+		</link>
+		<link>
+			<name>jai_imageio-1.1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_imageio/1.1/jai_imageio-1.1.jar</location>
+		</link>
+		<link>
+			<name>jai_mlib-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_mlib/1.1.3/jai_mlib-1.1.3.jar</location>
+		</link>
+		<link>
+			<name>jdom-1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar</location>
+		</link>
+	</linkedResources>
 </projectDescription>

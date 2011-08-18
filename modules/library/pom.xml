@@ -44,6 +44,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>opengis</module>
     <module>cql</module>
     <module>metadata</module>
     <module>referencing</module>

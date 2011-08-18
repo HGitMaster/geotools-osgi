@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.geotools.imagepyramid</name>
-	<comment></comment>
+	<name>gt-imagepyramid</name>
+	<comment>Datasource created to read a pyramid of georeferenced images or geotiff 
+    (and in future also JPEG2K).</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,9 +21,137 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>commons-beanutils-1.7.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar</location>
+		</link>
+		<link>
+			<name>commons-logging-1.1.1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar</location>
+		</link>
+		<link>
+			<name>de.berlios.it.geosolutions.imageio.ext.customstreams-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/de.berlios.it.geosolutions.imageio.ext.customstreams/1.1.0/de.berlios.it.geosolutions.imageio.ext.customstreams-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>ehcache-1.6.2.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/net/sf/ehcache/ehcache/1.6.2/ehcache-1.6.2.jar</location>
+		</link>
+		<link>
+			<name>gt-coverage-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi1/gt-coverage-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-epsg-hsql-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-epsg-hsql/8.0.0.M1osgi1/gt-epsg-hsql-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-geotiff-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-geotiff/8.0.0.M1osgi1/gt-geotiff-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-image-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-image/8.0.0.M1osgi1/gt-image-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-imagemosaic-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-imagemosaic/8.0.0.M1osgi1/gt-imagemosaic-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-jdbc-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi1/gt-jdbc-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-jdbc-postgis-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/jdbc/gt-jdbc-postgis/8.0.0.M1osgi1/gt-jdbc-postgis-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-jp2k-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jp2k/8.0.0.M1osgi1/gt-jp2k-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>gt-shapefile-8.0.0.M1osgi1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-shapefile/8.0.0.M1osgi1/gt-shapefile-8.0.0.M1osgi1.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-imagereadmt-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-imagereadmt/1.1.0/imageio-ext-imagereadmt-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-kakadu-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-kakadu/1.1.0/imageio-ext-kakadu-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-kakadujni-5.2.6.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-kakadujni/5.2.6/imageio-ext-kakadujni-5.2.6.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-streams-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-streams/1.1.0/imageio-ext-streams-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-tiff-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-tiff/1.1.0/imageio-ext-tiff-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>imageio-ext-utilities-1.1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/it/geosolutions/imageio-ext/imageio-ext-utilities/1.1.0/imageio-ext-utilities-1.1.0.jar</location>
+		</link>
+		<link>
+			<name>jai_codec-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_codec/1.1.3/jai_codec-1.1.3.jar</location>
+		</link>
+		<link>
+			<name>jai_core-1.1.3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar</location>
+		</link>
+		<link>
+			<name>jai_imageio-1.1.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/javax/media/jai_imageio/1.1/jai_imageio-1.1.jar</location>
+		</link>
+		<link>
+			<name>jdom-1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar</location>
+		</link>
+		<link>
+			<name>postgresql-8.4-701.jdbc3.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/postgresql/postgresql/8.4-701.jdbc3/postgresql-8.4-701.jdbc3.jar</location>
+		</link>
+	</linkedResources>
 </projectDescription>

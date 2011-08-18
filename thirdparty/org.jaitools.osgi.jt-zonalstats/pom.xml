@@ -1,0 +1,105 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jaitools.osgi</groupId>
+  <artifactId>org.jaitools.osgi.jt-zonalstats</artifactId>
+  <packaging>bundle</packaging>
+  <name>JAITools ZonalStats operator</name>
+  <version>1.2.0</version>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>8.0.0.M1osgi1</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>org.jaitools</groupId>
+      <artifactId>jt-zonalstats</artifactId>
+      <version>1.2.0</version>
+      <optional>true</optional>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Name>ZonalStats operator</Bundle-Name>
+            <Bundle-SymbolicName>org.jaitools.osgi.jt-zonalstats</Bundle-SymbolicName>
+            <Bundle-Description>OSGI bundle for ZonalStats operator</Bundle-Description>
+            <Bundle-Version>1.2.0</Bundle-Version>
+            <Export-Package>org.jaitools.media.jai.zonalstats.*;-split-package:=merge-first</Export-Package>
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+          </instructions>
+          <unpackBundle>true</unpackBundle>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <id>get-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sources</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>unpack-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <includes>org/jaitools/**/*.java</includes>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>target/unpacked-sources</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <attach>true</attach>
+          <archive>
+            <manifestEntries>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+              <Bundle-Name>${name}</Bundle-Name>
+              <Bundle-SymbolicName>org.jaitools.osgi.jt-zonalstats.source </Bundle-SymbolicName>
+              <Bundle-Version>${version}</Bundle-Version>
+              <Eclipse-SourceBundle>
+                org.jaitools.osgi.jt-zonalstats;version="${version}";roots:="." </Eclipse-SourceBundle>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+    
+    <resources>
+      <resource>
+        <directory>target/unpacked-sources</directory>
+        <includes><include>org/jaitools/**/*.java</include></includes>
+      </resource>
+    </resources>
+  </build>
+</project>

@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Geotools Referencing Services
+Bundle-Name: Referencing services
 Bundle-SymbolicName: org.geotools.referencing
-Bundle-Version: 2.6.5.osgi2
+Bundle-Version: 8.0.0.M1osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
-Require-Bundle: org.geotools.metadata;bundle-version="2.6.0",
- org.opengis.geoapi;bundle-version="2.3.0"
+Require-Bundle: org.geotools.metadata;bundle-version="8.0.0",
+ org.geotools.opengis;bundle-version="8.0.0"
 Import-Package: javax.measure,
  javax.measure.converter,
  javax.measure.quantity,

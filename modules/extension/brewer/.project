@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.geotools.brewer</name>
-	<comment></comment>
+	<name>gt-brewer</name>
+	<comment>Brewer module, which contains ColorBrewer, etc.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,9 +20,22 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.pde.PluginNature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>jdom-1.0.jar</name>
+			<type>1</type>
+			<location>C:/Users/SBorodavkin/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar</location>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -93,6 +93,11 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
+      <groupId>net.java.dev.osgi</groupId>
+      <artifactId>net.java.dev.osgi.jsr275</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>    
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-referencing</artifactId>
       <version>${project.version}</version>

@@ -232,7 +232,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <version>${project.version}</version>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-wkt</artifactId>
       <version>${project.version}</version> 
