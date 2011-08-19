@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools API
-Bundle-SymbolicName: org.geotools.library.api
+Bundle-SymbolicName: org.geotools.api
 Bundle-Version: 8.0.0.M1osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.metadata;bundle-version="8.0.0",

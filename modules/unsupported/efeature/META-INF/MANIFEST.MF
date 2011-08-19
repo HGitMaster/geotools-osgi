@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.geotools.data.efeature.tests;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: org.geotools.data.efeature.tests.jar
 Bundle-Activator: org.geotools.data.efeature.tests.EFeatureTestsPlugin$Implementation
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin

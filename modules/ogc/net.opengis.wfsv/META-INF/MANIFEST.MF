@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Web Feature Service Versioning Model
 Bundle-SymbolicName: net.opengis.wfsv;singleton:=true
 Bundle-Version: 8.0.0.M1osgi1
-Bundle-Vendor: Geotools
+Bundle-Vendor: Harman/Becker
 Bundle-Localization: plugin
 Export-Package: net.opengis.wfsv,
  net.opengis.wfsv.impl,
@@ -13,7 +13,3 @@ Require-Bundle: org.eclipse.core.runtime,
  net.opengis.ows,
  net.opengis.wfs
 Eclipse-LazyStart: true
-Bundle-ClassPath: .,
- net.opengis.ows-8.0.0.M1osgi1.jar,
- net.opengis.wfs-8.0.0.M1osgi1.jar,
- org.w3.xlink-8.0.0.M1osgi1.jar

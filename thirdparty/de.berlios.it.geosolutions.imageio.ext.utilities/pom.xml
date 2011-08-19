@@ -28,6 +28,7 @@
           <instructions>
             <Bundle-SymbolicName>${artifactId}</Bundle-SymbolicName>
             <Export-Package>it.geosolutions.imageio.utilities</Export-Package>
+            <Import-Package>*;resolution:=optional</Import-Package>
           </instructions>
         </configuration>
       </plugin>

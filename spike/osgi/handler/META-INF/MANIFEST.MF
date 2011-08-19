@@ -7,4 +7,3 @@ Import-Package: javax.servlet,
  javax.servlet.http,
  org.osgi.service.http,
  org.geotools.gtcatalog
-Bundle-ClassPath: .
