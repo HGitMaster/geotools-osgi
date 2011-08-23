@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Geotools WorldImage datasource module
+Bundle-SymbolicName: org.geotools.image;singleton:=true
+Bundle-Version: 8.0.0.M1osgi1
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Eclipse-RegisterBuddy: org.geotools.metadata
+Require-Bundle: org.geotools.coverage;bundle-version="8.0.0",
+ org.geotools.main;bundle-version="8.0.0"
+Import-Package: com.sun.media.imageio.plugins.tiff,
+ com.sun.media.imageioimpl.plugins.tiff,
+ com.sun.media.jai.operator,
+ javax.measure.converter,
+ javax.measure.unit,
+ javax.media.jai,
+ javax.vecmath
+Export-Package: org.geotools.gce.image
+Bundle-Vendor: Harman/Becker
