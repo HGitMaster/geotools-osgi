@@ -13,6 +13,7 @@ Import-Package: com.vividsolutions.jts.geom,
  javax.measure.quantity,
  javax.measure.unit
 Export-Package: org.geotools.data,
+ org.geotools.data.simple,
  org.geotools.feature,
  org.geotools.feature.collection,
  org.geotools.feature.visitor,
