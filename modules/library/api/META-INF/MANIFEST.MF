@@ -20,5 +20,6 @@ Export-Package: org.geotools.data,
  org.geotools.filter.expression,
  org.geotools.geometry.jts,
  org.geotools.styling,
- org.geotools.util
+ org.geotools.util,
+ org.geotools.factory
 Bundle-Vendor: Harman/Becker
