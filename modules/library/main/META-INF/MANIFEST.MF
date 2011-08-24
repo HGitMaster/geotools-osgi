@@ -57,5 +57,6 @@ Export-Package: org.geotools.data,
  org.geotools.styling,
  org.geotools.styling.visitor,
  org.geotools.util,
- org.geotools.xml.transform
+ org.geotools.xml.transform,
+ org.geotools.renderer
 Bundle-Vendor: Harman/Becker
