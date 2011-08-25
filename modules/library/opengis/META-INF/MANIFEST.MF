@@ -7,8 +7,8 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: 
   net.java.dev.osgi.jsr275,  
-  java3d.osgi.vecmath,
   com.springsource.org.apache.commons.pool;version="1.5.3"
+Import-Package: javax.vecmath  
 Export-Package: org.opengis.annotation,
   org.opengis.coverage,
   org.opengis.coverage.grid,
