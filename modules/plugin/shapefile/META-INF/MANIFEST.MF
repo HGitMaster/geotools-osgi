@@ -9,7 +9,8 @@ Require-Bundle: org.geotools.api;bundle-version="8.0.0",
  org.geotools.main;bundle-version="8.0.0",
  org.geotools.metadata,
  org.geotools.referencing;bundle-version="8.0.0",
- org.geotools.opengis;bundle-version="8.0.0"
+ org.geotools.opengis;bundle-version="8.0.0",
+ org.geotools.data;bundle-version="8.0.0"
 Import-Package: com.vividsolutions.jts.algorithm,
  com.vividsolutions.jts.geom,
  com.vividsolutions.jts.geom.impl,
