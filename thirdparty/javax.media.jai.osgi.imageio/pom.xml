@@ -57,6 +57,8 @@
               com.sun.medialib.codec.* </Export-Package>
             <Private-Package>org.geotools.thirdparty.jai.imageio</Private-Package>
             <Import-Package>!sun.*,*</Import-Package>
+            <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
+            <Implementation-Version>1.0_01</Implementation-Version>
           </instructions>
           <!--
             This is required because Maven puts target/classes on the
