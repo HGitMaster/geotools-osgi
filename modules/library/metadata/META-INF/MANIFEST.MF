@@ -70,5 +70,6 @@ Export-Package: org.geotools.console,
  org.geotools.resources,
  org.geotools.resources.i18n,
  org.geotools.util,
- org.geotools.util.logging
+ org.geotools.util.logging,
+ org.geotools.text
 Bundle-Vendor: Harman/Becker
