@@ -16,7 +16,9 @@ Import-Package: com.vividsolutions.jts.geom,
  org.opengis.filter,
  org.opengis.filter.expression,
  org.opengis.filter.identity,
- org.opengis.filter.spatial
+ org.opengis.filter.spatial,
+ org.opengis.filter.capability,
+ org.opengis.parameter
 Export-Package: org.geotools.filter.function,
  org.geotools.filter.text.commons,
  org.geotools.filter.text.cql2,
