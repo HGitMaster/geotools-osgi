@@ -28,7 +28,8 @@ Import-Package: com.sun.media.imageio.plugins.tiff,
  javax.media.jai.util,
  javax.media.jai.widget,
  javax.vecmath,
- org.jdom;version="1.0.0"
+ org.jdom;version="1.0.0",
+ it.geosolutions.imageio.plugins.tiff
 Export-Package: org.geotools.coverage,
  org.geotools.coverage.grid,
  org.geotools.coverage.grid.io,
