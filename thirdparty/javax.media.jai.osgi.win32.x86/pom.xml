@@ -32,9 +32,9 @@
             <Fragment-Host>javax.media.jai.osgi</Fragment-Host>
             <Bundle-DocURL>http://download.java.net/media/jai/javadoc/1.1.3/jai-apidocs/</Bundle-DocURL>
             <Bundle-Vendor>Harman/Becker</Bundle-Vendor>
-            <Bundle-NativeCode> mlib_jai.dll;osname=win32;processor=x86,
-              mlib_jai_mmx.dll;osname=win32;processor=x86,
-              mlib_jai_util.dll;osname=win32;processor=x86 </Bundle-NativeCode>
+            <Bundle-NativeCode> mlib_jai.dll;osname=win32;osname=windows 7;processor=x86,
+              mlib_jai_mmx.dll;osname=win32;osname=windows 7;processor=x86,
+              mlib_jai_util.dll;osname=win32;osname=windows 7;processor=x86 </Bundle-NativeCode>
             <!-- Override the default of * to suppress a warning -->
             <Import-Package></Import-Package>
           </instructions>
