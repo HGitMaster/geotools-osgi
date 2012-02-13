@@ -279,31 +279,33 @@ public class GeoTiffReader extends AbstractGridCoverage2DReader implements GridC
             reader.setInput(inStream);
             final IIOMetadata iioMetadata = reader.getImageMetadata(0);
             final GeoTiffIIOMetadataDecoder metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
-            gtcs = new GeoTiffMetadata2CRSAdapter(hints);
-            
-            // //
-            //
-            // get the CRS INFO
-            //
-            // //
-            final Object tempCRS = this.hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
-            if (tempCRS != null) {
-                this.crs = (CoordinateReferenceSystem) tempCRS;
-                if (LOGGER.isLoggable(Level.FINE))
-                    LOGGER.log(Level.FINE, "Using forced coordinate reference system");
-            } else {
-                // check metadata first
-                if (metadata.hasGeoKey()&& gtcs != null)
-                    crs = gtcs.createCoordinateSystem(metadata);
+            synchronized (GeoTiffReader.class) {
+                gtcs = new GeoTiffMetadata2CRSAdapter(hints);
+                
+                // //
+                //
+                // get the CRS INFO
+                //
+                // //
+                final Object tempCRS = this.hints.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+                if (tempCRS != null) {
+                    this.crs = (CoordinateReferenceSystem) tempCRS;
+                    if (LOGGER.isLoggable(Level.FINE))
+                        LOGGER.log(Level.FINE, "Using forced coordinate reference system");
+                } else {
+                    // check metadata first
+                    if (metadata.hasGeoKey()&& gtcs != null)
+                        crs = gtcs.createCoordinateSystem(metadata);
 
-                if (crs == null)
-                    crs = getCRS(source);
-            }
+                    if (crs == null)
+                        crs = getCRS(source);
+                }
 
-            if (crs == null){
-            if(LOGGER.isLoggable(Level.WARNING))
-                LOGGER.warning("Coordinate Reference System is not available");
-                crs = AbstractGridFormat.getDefaultCRS();
+                if (crs == null){
+                if(LOGGER.isLoggable(Level.WARNING))
+                    LOGGER.warning("Coordinate Reference System is not available");
+                    crs = AbstractGridFormat.getDefaultCRS();
+                }
             }
 
             if (metadata.hasNoData())
