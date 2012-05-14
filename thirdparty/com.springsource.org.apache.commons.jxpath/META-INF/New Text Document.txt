@@ -1,0 +1,59 @@
+Manifest-Version: 1.0
+Export-Package: org.apache.commons.jxpath;version="1.2.0";uses:="javax
+ .xml.transform",org.apache.commons.jxpath.functions;version="1.2.0";u
+ ses:="org.apache.commons.jxpath",org.apache.commons.jxpath.ri;version
+ ="1.2.0";uses:="org.apache.commons.jxpath,org.apache.commons.jxpath.r
+ i.axes,org.apache.commons.jxpath.ri.compiler,org.apache.commons.jxpat
+ h.ri.model",org.apache.commons.jxpath.ri.axes;version="1.2.0";uses:="
+ org.apache.commons.jxpath,org.apache.commons.jxpath.ri,org.apache.com
+ mons.jxpath.ri.compiler,org.apache.commons.jxpath.ri.model,org.apache
+ .commons.jxpath.ri.model.beans",org.apache.commons.jxpath.ri.compiler
+ ;version="1.2.0";uses:="org.apache.commons.jxpath,org.apache.commons.
+ jxpath.ri",org.apache.commons.jxpath.ri.model;version="1.2.0";uses:="
+ org.apache.commons.jxpath,org.apache.commons.jxpath.ri,org.apache.com
+ mons.jxpath.ri.compiler",org.apache.commons.jxpath.ri.model.beans;ver
+ sion="1.2.0";uses:="org.apache.commons.jxpath,org.apache.commons.jxpa
+ th.ri,org.apache.commons.jxpath.ri.compiler,org.apache.commons.jxpath
+ .ri.model",org.apache.commons.jxpath.ri.model.container;version="1.2.
+ 0";uses:="org.apache.commons.jxpath,org.apache.commons.jxpath.ri,org.
+ apache.commons.jxpath.ri.compiler,org.apache.commons.jxpath.ri.model"
+ ,org.apache.commons.jxpath.ri.model.dom;version="1.2.0";uses:="org.ap
+ ache.commons.jxpath,org.apache.commons.jxpath.ri,org.apache.commons.j
+ xpath.ri.compiler,org.apache.commons.jxpath.ri.model,org.w3c.dom",org
+ .apache.commons.jxpath.ri.model.dynabeans;version="1.2.0";uses:="org.
+ apache.commons.beanutils,org.apache.commons.jxpath.ri,org.apache.comm
+ ons.jxpath.ri.model,org.apache.commons.jxpath.ri.model.beans",org.apa
+ che.commons.jxpath.ri.model.dynamic;version="1.2.0";uses:="org.apache
+ .commons.jxpath,org.apache.commons.jxpath.ri,org.apache.commons.jxpat
+ h.ri.model,org.apache.commons.jxpath.ri.model.beans",org.apache.commo
+ ns.jxpath.ri.model.jdom;version="1.2.0";uses:="org.apache.commons.jxp
+ ath,org.apache.commons.jxpath.ri,org.apache.commons.jxpath.ri.compile
+ r,org.apache.commons.jxpath.ri.model,org.jdom",org.apache.commons.jxp
+ ath.ri.parser;version="1.2.0";uses:="org.apache.commons.jxpath.ri",or
+ g.apache.commons.jxpath.servlet;version="1.2.0";uses:="javax.servlet,
+ javax.servlet.http,javax.servlet.jsp,org.apache.commons.jxpath",org.a
+ pache.commons.jxpath.util;version="1.2.0";uses:="org.apache.commons.j
+ xpath",org.apache.commons.jxpath.xml;version="1.2.0"
+Implementation-Title: org.apache.commons.jxpath
+Bundle-Classpath: .
+Implementation-Version: 1.2
+Built-By: Dmitri
+Specification-Vendor: The Apache Software Foundation
+Package: org.apache.commons.jxpath
+Bundle-Name: XPath for Java Objects
+Created-By: Apache Maven
+Ant-Version: Apache Ant 1.5.3 
+Implementation-Vendor: The Apache Software Foundation
+Bundle-Vendor: SpringSource
+Build-Jdk: 1.6_21
+Bundle-Version: 1.2.0
+Specification-Title: XPath for Java Objects
+Bundle-ManifestVersion: 2
+Import-Bundle: com.springsource.javax.servlet.jsp;version="[2.1.0,2.1.0]"
+Import-Package: javax.servlet;version="[2.4.0, 3.0.0)",javax.servlet.h
+ ttp;version="[2.4.0, 3.0.0)",javax.xml.parsers,javax.xml.transform,
+ javax.xml.transform.dom,org.apache.commons.beanutils;version="[1.7.0, 2.0.0)",
+ org.jdom;version="[1.0.0, 2.0.0)",org.jdom.input;version="[1.0.0, 2.0.0)",org.w3c.dom
+Bundle-SymbolicName: com.springsource.org.apache.commons.jxpath
+Extension-Name: commons-jxpath
+

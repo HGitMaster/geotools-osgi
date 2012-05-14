@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Graph module
+Bundle-SymbolicName: org.geotools.graph
+Bundle-Version: 8.0.0.M1osgi1
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.geotools.main;bundle-version="8.0.0"
+Export-Package: org.geotools.graph
+Bundle-Vendor: Harman/Becker

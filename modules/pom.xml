@@ -230,7 +230,7 @@
             <group>
               <title>XML and derivatives (GML, SVG)</title>
               <packages>
-                org.geotools.xsd*:org.geotools.gml*:org.geotools.svg*
+                org.geotools.xsd*:org.geotools.gml*:org.geotools.svg*:org.geotools.kml*:org.geotools.xml*:org.geotools.xlink*:org.geotools.xs*:
               </packages>
             </group>
             <group>

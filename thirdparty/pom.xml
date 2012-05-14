@@ -36,7 +36,8 @@
     <module>net.java.dev.osgi.jsr275</module>
     <module>de.berlios.com.miglayout</module>
     <module>de.berlios.it.geosolutions.imageio.ext.tiff</module>
-    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>    
+    <module>de.berlios.it.geosolutions.imageio.ext.utilities</module>
+    <module>de.berlios.it.geosolutions.imageio.ext.arcgrid</module>       
     <module>de.berlios.org.apache.commons.cli2</module>
     <module>javax.media.jai.osgi</module>
     <module>javax.media.jai.osgi.linux.x86_64</module>
@@ -60,6 +61,7 @@
     <module>com.springsource.com.lowagie.text</module>
     <module>com.springsource.org.apache.bcel</module>
     <module>com.springsource.org.apache.commons.collections</module>
+	<module>com.springsource.org.apache.commons.jxpath</module>
     <module>com.springsource.org.apache.commons.beanutils</module>
     <module>com.springsource.org.apache.regexp</module>
     <module>com.springsource.org.apache.xalan</module>

@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Export-Package: .,
+ org.picocontainer;version="1.2.0", 
+ org.picocontainer.alternatives;version="1.2.0",
+ org.picocontainer.defaults;version="1.2.0",
+ org.picocontainer.monitors;version="1.2.0"
+Implementation-Title: picocontainer
+Implementation-Version: 1.2
+Bundle-Classpath: .
+Built-By: mauro
+Specification-Vendor: Codehaus
+Bundle-Name: PicoContainer
+Created-By: Apache Maven
+Implementation-Vendor: Codehaus
+Bundle-Vendor: SpringSource
+Build-Jdk: 1.5.0_05
+Bundle-Version: 1.2.0
+Specification-Title: Please refer to the <a href="http://picocontainer
+ .org/">main website</a> for documentation.
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.springsource.org.picocontainer
+Extension-Name: picocontainer
+Archiver-Version: Plexus Archiver
+
