@@ -82,5 +82,6 @@
     <module>com.springsource.org.hamcrest.core</module>
     <module>de.berlios.com.google.google-collections</module>
 	<module>com.springsource.javax.servlet.jsp</module>
+	<module>com.springsource.javax.el</module>
   </modules>
 </project>
