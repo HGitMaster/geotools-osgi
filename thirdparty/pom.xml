@@ -81,5 +81,6 @@
     <module>com.springsource.org.junit</module>
     <module>com.springsource.org.hamcrest.core</module>
     <module>de.berlios.com.google.google-collections</module>
+	<module>com.springsource.javax.servlet.jsp</module>
   </modules>
 </project>
