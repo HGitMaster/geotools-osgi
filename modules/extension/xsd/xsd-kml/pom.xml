@@ -75,20 +75,19 @@
     </dependency>    
   </dependencies>
 
-  <!--build>
+  <build>
     <plugins>
-	<plugin>
-			<artifactId>maven-jar-plugin</artifactId>
-			<configuration>
-				<archive>
-					<manifestFile>META-INF/MANIFEST.MF</manifestFile>
-			  <manifest>
-				 <addClasspath>false</addClasspath>
-			  </manifest>
-				</archive>
-			</configuration>
-		</plugin>
       <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+	<configuration>
+	  <archive>
+	    <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+	    <manifest>
+	      <addClasspath>false</addClasspath>
+	    </manifest>
+	  </archive>
+	</configuration>
+      </plugin>
         <groupId>org.geotools.maven</groupId>
         <artifactId>xmlcodegen</artifactId>
         <configuration>
@@ -96,11 +95,7 @@
   	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/kml//</schemaSourceDirectory>
           <destinationPackage>org.geotools.kml</destinationPackage>
         </configuration>
-      </plugin>
-	  
-    </plugins>
-  </build-->  <build>
-    <plugins>
+      </plugin-->
       <!-- Fetch bundle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
