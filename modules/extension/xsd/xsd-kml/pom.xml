@@ -88,6 +88,7 @@
 	  </archive>
 	</configuration>
       </plugin>
+      <plugin>
         <groupId>org.geotools.maven</groupId>
         <artifactId>xmlcodegen</artifactId>
         <configuration>
@@ -95,7 +96,7 @@
   	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/kml//</schemaSourceDirectory>
           <destinationPackage>org.geotools.kml</destinationPackage>
         </configuration>
-      </plugin-->
+      </plugin>
       <!-- Fetch bundle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
