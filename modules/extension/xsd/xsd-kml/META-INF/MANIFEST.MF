@@ -1,9 +1,15 @@
 Manifest-Version: 1.0
+Project-Version: 8.0.0.M1osgi1
 Bundle-ManifestVersion: 2
 Bundle-Name: XSD KML-support module
 Bundle-SymbolicName: org.geotools.xsd.kml
 Bundle-Version: 8.0.0.M1osgi1
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.geotools.xsd.core;bundle-version="8.0.0"
+Require-Bundle: org.geotools.xsd.core;bundle-version="8.0.0",org.geoto
+ ols.api;bundle-version="8.0.0",com.vividsolutions.osgi.jts;bundle-ver
+ sion="1.12",org.geotools.main;bundle-version="8.0.0",org.geotools.ope
+ ngis;bundle-version="8.0.0"
+Import-Package: org.eclipse.xsd,org.eclipse.xsd.util,org.picocontainer
+ ,org.picocontainer.defaults, org.opengis.feature.type
 Export-Package: org.geotools.kml, org.geotools.kml.bindings
 Bundle-Vendor: Harman/Becker
