@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>arcsde-plugin</artifactId>
-    <version>8.0.0.M1osgi1</version>
+    <version>8.0.0.M1osgi2</version>
   </parent>
 
 

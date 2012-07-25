@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
-Project-Version: 8.0.0.M1osgi1
+Project-Version: 8.0.0.M1osgi2
 Bundle-ManifestVersion: 2
 Bundle-Name: XSD KML-support module
 Bundle-SymbolicName: org.geotools.xsd.kml
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.xsd.core;bundle-version="8.0.0",org.geoto
  ols.api;bundle-version="8.0.0",com.vividsolutions.osgi.jts;bundle-ver

@@ -33,9 +33,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>gt-jdbc-8.0.0.M1osgi1.jar</name>
+			<name>gt-jdbc-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi1/gt-jdbc-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi2/gt-jdbc-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
 			<name>jdom-1.0.jar</name>

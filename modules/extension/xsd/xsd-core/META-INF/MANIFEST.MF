@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
-Project-Version: 8.0.0.M1osgi1
+Project-Version: 8.0.0.M1osgi2
 Bundle-ManifestVersion: 2
 Bundle-Name: XSD core module
 Bundle-SymbolicName: org.geotools.xsd.core
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.opengis;bundle-version="8.0.0",org.geotoo
  ls.metadata;bundle-version="8.0.0",org.geotools.referencing;bundle-ve
