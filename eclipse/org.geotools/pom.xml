@@ -5,13 +5,13 @@
   <artifactId>org.geotools</artifactId>
   <packaging>jar</packaging>
   <name>Geotools Branding Plug-In</name>
-  <version>8.0.0.M1osgi1</version>
+  <version>8.0.0.M1osgi2</version>
   <description>Geotools Branding Plug-In</description>
 
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>eclipse</artifactId>
-    <version>8.0.0.M1osgi1</version>
+    <version>8.0.0.M1osgi2</version>
   </parent>
   <build>
 

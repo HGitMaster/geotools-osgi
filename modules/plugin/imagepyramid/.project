@@ -54,49 +54,49 @@
 			<location>C:/Users/SBorodavkin/.m2/repository/net/sf/ehcache/ehcache/1.6.2/ehcache-1.6.2.jar</location>
 		</link>
 		<link>
-			<name>gt-coverage-8.0.0.M1osgi1.jar</name>
+			<name>gt-coverage-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi1/gt-coverage-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi2/gt-coverage-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-epsg-hsql-8.0.0.M1osgi1.jar</name>
+			<name>gt-epsg-hsql-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-epsg-hsql/8.0.0.M1osgi1/gt-epsg-hsql-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-epsg-hsql/8.0.0.M1osgi2/gt-epsg-hsql-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-geotiff-8.0.0.M1osgi1.jar</name>
+			<name>gt-geotiff-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-geotiff/8.0.0.M1osgi1/gt-geotiff-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-geotiff/8.0.0.M1osgi2/gt-geotiff-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-image-8.0.0.M1osgi1.jar</name>
+			<name>gt-image-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-image/8.0.0.M1osgi1/gt-image-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-image/8.0.0.M1osgi2/gt-image-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-imagemosaic-8.0.0.M1osgi1.jar</name>
+			<name>gt-imagemosaic-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-imagemosaic/8.0.0.M1osgi1/gt-imagemosaic-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-imagemosaic/8.0.0.M1osgi2/gt-imagemosaic-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-jdbc-8.0.0.M1osgi1.jar</name>
+			<name>gt-jdbc-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi1/gt-jdbc-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jdbc/8.0.0.M1osgi2/gt-jdbc-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-jdbc-postgis-8.0.0.M1osgi1.jar</name>
+			<name>gt-jdbc-postgis-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/jdbc/gt-jdbc-postgis/8.0.0.M1osgi1/gt-jdbc-postgis-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/jdbc/gt-jdbc-postgis/8.0.0.M1osgi2/gt-jdbc-postgis-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-jp2k-8.0.0.M1osgi1.jar</name>
+			<name>gt-jp2k-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jp2k/8.0.0.M1osgi1/gt-jp2k-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-jp2k/8.0.0.M1osgi2/gt-jp2k-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-shapefile-8.0.0.M1osgi1.jar</name>
+			<name>gt-shapefile-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-shapefile/8.0.0.M1osgi1/gt-shapefile-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-shapefile/8.0.0.M1osgi2/gt-shapefile-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
 			<name>imageio-ext-imagereadmt-1.1.0.jar</name>
