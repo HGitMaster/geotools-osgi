@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Web Feature Service Model
 Bundle-SymbolicName: net.opengis.wfs;singleton:=true
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-Vendor: Harman/Becker
 Bundle-Localization: plugin
 Export-Package: net.opengis.wfs,

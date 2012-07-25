@@ -5,11 +5,11 @@
   <artifactId>com.springsource.org.apache.log4j</artifactId>
   <packaging>jar</packaging>
   <name>Apache Log4J</name>
-  <version>1.2.15</version>
+  <version>1.2.16</version>
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>thirdparty</artifactId>
-    <version>8.0.0.M1osgi1</version>
+    <version>8.0.0.M1osgi2</version>
   </parent>
   <build>
     <plugins>

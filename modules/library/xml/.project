@@ -64,49 +64,49 @@
 			<location>C:/Users/SBorodavkin/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar</location>
 		</link>
 		<link>
-			<name>gt-coverage-8.0.0.M1osgi1.jar</name>
+			<name>gt-coverage-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi1/gt-coverage-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi2/gt-coverage-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-graph-8.0.0.M1osgi1.jar</name>
+			<name>gt-graph-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-graph/8.0.0.M1osgi1/gt-graph-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-graph/8.0.0.M1osgi2/gt-graph-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-core-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-core-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-core/8.0.0.M1osgi1/gt-xsd-core-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-core/8.0.0.M1osgi2/gt-xsd-core-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-fes-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-fes-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-fes/8.0.0.M1osgi1/gt-xsd-fes-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-fes/8.0.0.M1osgi2/gt-xsd-fes-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-filter-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-filter-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-filter/8.0.0.M1osgi1/gt-xsd-filter-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-filter/8.0.0.M1osgi2/gt-xsd-filter-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-gml2-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-gml2-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-gml2/8.0.0.M1osgi1/gt-xsd-gml2-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-gml2/8.0.0.M1osgi2/gt-xsd-gml2-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-gml3-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-gml3-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-gml3/8.0.0.M1osgi1/gt-xsd-gml3-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-gml3/8.0.0.M1osgi2/gt-xsd-gml3-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-ows-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-ows-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-ows/8.0.0.M1osgi1/gt-xsd-ows-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-ows/8.0.0.M1osgi2/gt-xsd-ows-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xsd-wfs-8.0.0.M1osgi1.jar</name>
+			<name>gt-xsd-wfs-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-wfs/8.0.0.M1osgi1/gt-xsd-wfs-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/xsd/gt-xsd-wfs/8.0.0.M1osgi2/gt-xsd-wfs-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
 			<name>imageio-ext-tiff-1.1.0.jar</name>
@@ -139,19 +139,19 @@
 			<location>C:/Users/SBorodavkin/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar</location>
 		</link>
 		<link>
-			<name>net.opengis.ows-8.0.0.M1osgi1.jar</name>
+			<name>net.opengis.ows-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/net.opengis.ows/8.0.0.M1osgi1/net.opengis.ows-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/net.opengis.ows/8.0.0.M1osgi2/net.opengis.ows-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>net.opengis.wfs-8.0.0.M1osgi1.jar</name>
+			<name>net.opengis.wfs-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/net.opengis.wfs/8.0.0.M1osgi1/net.opengis.wfs-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/net.opengis.wfs/8.0.0.M1osgi2/net.opengis.wfs-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>org.w3.xlink-8.0.0.M1osgi1.jar</name>
+			<name>org.w3.xlink-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/org.w3.xlink/8.0.0.M1osgi1/org.w3.xlink-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/ogc/org.w3.xlink/8.0.0.M1osgi2/org.w3.xlink-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
 			<name>picocontainer-1.2.jar</name>

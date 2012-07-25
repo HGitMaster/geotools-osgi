@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Geotools GeoTIFF grid coverage exchange module
 Bundle-SymbolicName: org.geotools.geotiff;singleton:=true
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: org.geotools.coverage;bundle-version="8.0.0",
