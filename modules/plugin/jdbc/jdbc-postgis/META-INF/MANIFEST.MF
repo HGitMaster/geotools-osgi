@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PostGIS DataStore
 Bundle-SymbolicName: org.geotools.jdbc.postgis
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.geotools.opengis;bundle-version="8.0.0",
  org.geotools.jdbc;bundle-version="8.0.0",

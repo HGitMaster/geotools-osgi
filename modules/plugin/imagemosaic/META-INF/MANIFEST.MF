@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: imagemosaic datasource module
 Bundle-SymbolicName: org.geotools.imagemosaic
-Bundle-Version: 8.0.0.M1osgi1
+Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.geotools.main;bundle-version="8.0.0",
  org.geotools.referencing;bundle-version="8.0.0",

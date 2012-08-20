@@ -33,29 +33,29 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>gt-coverage-8.0.0.M1osgi1.jar</name>
+			<name>gt-coverage-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi1/gt-coverage-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-coverage/8.0.0.M1osgi2/gt-coverage-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-cql-8.0.0.M1osgi1.jar</name>
+			<name>gt-cql-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-cql/8.0.0.M1osgi1/gt-cql-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-cql/8.0.0.M1osgi2/gt-cql-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-render-8.0.0.M1osgi1.jar</name>
+			<name>gt-render-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-render/8.0.0.M1osgi1/gt-render-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-render/8.0.0.M1osgi2/gt-render-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-wms-8.0.0.M1osgi1.jar</name>
+			<name>gt-wms-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-wms/8.0.0.M1osgi1/gt-wms-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-wms/8.0.0.M1osgi2/gt-wms-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
-			<name>gt-xml-8.0.0.M1osgi1.jar</name>
+			<name>gt-xml-8.0.0.M1osgi2.jar</name>
 			<type>1</type>
-			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-xml/8.0.0.M1osgi1/gt-xml-8.0.0.M1osgi1.jar</location>
+			<location>C:/Users/SBorodavkin/.m2/repository/org/geotools/gt-xml/8.0.0.M1osgi2/gt-xml-8.0.0.M1osgi2.jar</location>
 		</link>
 		<link>
 			<name>imageio-ext-tiff-1.1.0.jar</name>
