@@ -49,7 +49,7 @@
     <module>org.jaitools.osgi.jt-utils</module>
     <module>org.jaitools.osgi.jt-vectorbinarize</module>
     <module>org.jaitools.osgi.jt-zonalstats</module>
-    <module>org.apache.batik.osgi.transcoder</module>
+    <module>com.springsource.org.apache.batik.transcoder</module>
     <module>com.springsource.org.apache.batik.dom</module>
     <module>com.springsource.org.apache.batik.dom.svg</module>
     <module>com.springsource.org.apache.batik.util</module>
