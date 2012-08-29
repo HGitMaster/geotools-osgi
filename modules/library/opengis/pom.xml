@@ -185,8 +185,8 @@
     </dependency>
     
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>com.springsource.org.apache.commons.pool</artifactId>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     

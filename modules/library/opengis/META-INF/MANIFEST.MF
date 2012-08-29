@@ -6,7 +6,7 @@ Bundle-Version: 8.0.0.M1osgi2
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-RegisterBuddy: org.geotools.metadata
 Require-Bundle: net.java.dev.osgi.jsr275,
- com.springsource.org.apache.commons.pool;bundle-version="1.5.3"
+ org.apache.commons.pool;bundle-version="1.5.3"
 Import-Package: javax.vecmath
 Export-Package: org.opengis.annotation,
  org.opengis.coverage,

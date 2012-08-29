@@ -848,9 +848,9 @@
        <version>3.2.0</version> 
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>com.springsource.org.apache.commons.pool</artifactId>
-        <version>1.5.3</version>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>1.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
