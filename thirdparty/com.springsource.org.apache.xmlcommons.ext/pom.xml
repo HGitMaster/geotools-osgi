@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.xmlcommons</groupId>
+  <artifactId>com.springsource.org.apache.xmlcommons.ext</artifactId>
+  <packaging>bundle</packaging>
+  <name>Apache XML Commons XML Extension-APIs</name>
+  <version>1.3.4</version>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>thirdparty</artifactId>
+    <version>8.0.0.M1osgi2</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis-ext</artifactId>
+      <version>1.3.04</version>
+      <optional>true</optional>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Name>Apache XML Commons XML Extension-APIs</Bundle-Name>
+            <Bundle-SymbolicName>com.springsource.org.apache.xmlcommons.ext</Bundle-SymbolicName>
+            <Bundle-Description>OSGI bundle for Apache XML Commons XML Extension-APIs</Bundle-Description>
+            <Bundle-Version>1.3.4</Bundle-Version>
+            <Export-Package>
+              org.w3c.css.sac.*,
+              org.w3c.dom.smil.*,
+              org.w3c.dom.svg.*</Export-Package>
+            <Import-Package>
+              org.w3c.dom,
+              org.w3c.dom.css,
+              org.w3c.dom.events,
+              org.w3c.dom.views,
+              org.xml.sax</Import-Package>
+            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+          </instructions>
+          <unpackBundle>true</unpackBundle>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -27,7 +27,7 @@
   <artifactId>gt-main</artifactId>
   <packaging>jar</packaging>
   <name>Main module</name>
-  
+
 
   <scm>
     <connection>
@@ -234,7 +234,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt-epsg-wkt</artifactId>
-      <version>${project.version}</version> 
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -259,6 +259,9 @@
          <artifactId>maven-jar-plugin</artifactId>
          <configuration>
             <archive>
+            <manifestEntries>
+              <Build-Identifier>${env.BUILD_NUMBER}</Build-Identifier>
+            </manifestEntries>
                <manifestFile>META-INF/MANIFEST.MF</manifestFile>
                   <manifest>
                      <addClasspath>false</addClasspath>
@@ -288,8 +291,8 @@
             </goals>
           </execution>
         </executions>
-        <configuration> 
-          <attach>true</attach>                 
+        <configuration>
+          <attach>true</attach>
           <archive>
             <manifestEntries>
               <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
