@@ -178,7 +178,8 @@
             <configuration>
               <target>
                 <copy file="target/${artifactId}-${version}-local.jar"
-                      tofile="target/${artifactId}-${version}.jar"/>
+                      tofile="target/${artifactId}-${version}.jar"
+					  overwrite="true"/>
               </target>
             </configuration>
           </execution>
