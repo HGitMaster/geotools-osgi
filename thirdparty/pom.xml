@@ -80,7 +80,6 @@
     <module>com.springsource.org.apache.batik.anim</module>
     <module>com.springsource.org.apache.batik.bridge</module>
     <module>com.springsource.org.apache.batik.css</module>
-    <module>com.springsource.org.apache.batik.dom</module>
     <module>com.springsource.org.apache.batik.dom.svg</module>
     <module>com.springsource.org.apache.batik.ext</module>
     <module>com.springsource.org.apache.batik.ext.awt</module>
@@ -91,5 +90,7 @@
     <module>com.springsource.org.apache.batik.transcoder</module>
     <module>com.springsource.org.apache.batik.util</module>
     <module>com.springsource.org.apache.batik.xml</module>
+    <!-- Patched source code, compiling whole bundle, thus LAST of Batik -->
+    <module>com.springsource.org.apache.batik.dom</module>
   </modules>
 </project>

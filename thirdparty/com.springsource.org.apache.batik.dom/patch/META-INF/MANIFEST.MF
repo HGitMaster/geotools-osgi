@@ -1,0 +1,37 @@
+Manifest-Version: 1.0
+Export-Package: org.apache.batik.dom;version="1.7.0";uses:="javax.xml.
+ transform,org.apache.batik.css.engine,org.apache.batik.css.engine.val
+ ue,org.apache.batik.css.parser,org.apache.batik.dom.events,org.apache
+ .batik.dom.util,org.apache.batik.dom.xbl,org.apache.xpath.objects,org
+ .w3c.dom,org.w3c.dom.css,org.w3c.dom.events,org.w3c.dom.stylesheets,o
+ rg.w3c.dom.traversal,org.w3c.dom.views,org.w3c.dom.xpath",org.apache.
+ batik.dom.events;version="1.7.0";uses:="org.apache.batik.dom,org.w3c.
+ dom,org.w3c.dom.events,org.w3c.dom.views",org.apache.batik.dom.resour
+ ces;version="1.7.0",org.apache.batik.dom.traversal;version="1.7.0";us
+ es:="org.apache.batik.dom,org.w3c.dom,org.w3c.dom.traversal",org.apac
+ he.batik.dom.util;version="1.7.0";uses:="org.w3c.dom,org.w3c.dom.css,
+ org.w3c.dom.events,org.xml.sax",org.apache.batik.dom.xbl;version="1.7
+ .0";uses:="org.w3c.dom,org.w3c.dom.events"
+Implementation-Title: Batik DOM Level 3 implementation
+Bundle-Classpath: .
+Implementation-Version: 1.7+localpatch
+Bundle-Name: Apache Batik DOM implementation
+Implementation-Vendor: The Apache Software Foundation (http://xmlgraph
+ ics.apache.org/batik/)
+Ant-Version: Apache Ant 1.6.5
+Bundle-Version: 1.7.0
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: com.springsource.org.apache.batik.dom
+Import-Package: javax.xml.parsers,javax.xml.transform,org.apache.batik
+ .css.engine;version="[1.7.0, 1.7.0]",org.apache.batik.css.engine.valu
+ e;version="[1.7.0, 1.7.0]",org.apache.batik.css.parser;version="[1.7.
+ 0, 1.7.0]",org.apache.batik.i18n;version="[1.7.0, 1.7.0]",org.apache.
+ batik.util;version="[1.7.0, 1.7.0]",org.apache.batik.xml;version="[1.
+ 7.0, 1.7.0]",org.apache.xml.utils;version="[2.7.0, 3.0.0)",org.apache
+ .xpath;version="[2.7.0, 3.0.0)",org.apache.xpath.objects;version="[2.
+ 7.0, 3.0.0)",org.w3c.css.sac;resolution:=optional,org.w3c.dom,org.w3c
+ .dom.css;resolution:=optional,org.w3c.dom.events;resolution:=optional
+ ,org.w3c.dom.smil;resolution:=optional,org.w3c.dom.stylesheets;resolu
+ tion:=optional,org.w3c.dom.traversal;resolution:=optional,org.w3c.dom
+ .views;resolution:=optional,org.w3c.dom.xpath;resolution:=optional,or
+ g.xml.sax,org.xml.sax.ext,org.xml.sax.helpers
