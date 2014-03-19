@@ -75,8 +75,8 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>com.springsource.org.apache.commons.pool</artifactId>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ibm.icu</groupId>
