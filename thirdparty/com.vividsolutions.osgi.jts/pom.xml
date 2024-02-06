@@ -32,9 +32,9 @@
             <Bundle-Name>Java Topology Suite</Bundle-Name>
             <Bundle-SymbolicName>com.vividsolutions.osgi.jts</Bundle-SymbolicName>
             <Bundle-Description>OSGI bundle for Java Topology Suite</Bundle-Description>
-            <Bundle-Version>1.12</Bundle-Version>
-            <Export-Package>com.vividsolutions.jts.*</Export-Package>
-            <Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency>
+	    <Bundle-Version>1.12</Bundle-Version>
+            <Export-Package>com.vividsolutions.jts.*;-split-package:=first</Export-Package>
+            <!--Embed-Dependency>*;scope=compile|runtime;inline=true</Embed-Dependency-->
           </instructions>
           <unpackBundle>true</unpackBundle>
         </configuration>
@@ -46,22 +46,71 @@
         <executions>
           <execution>
             <id>get-sources</id>
-            <phase>verify</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>sources</goal>
             </goals>
           </execution>
           <execution>
             <id>unpack-sources</id>
-            <phase>verify</phase>
+            <phase>generate-sources</phase>
             <goals>
-              <goal>unpack-dependencies</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
-              <classifier>sources</classifier>
-              <includes>**/*.java</includes>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.vividsolutions</groupId>
+                  <artifactId>jts</artifactId>
+                  <version>1.12</version>
+                  <type>jar</type>
+                  <classifier>sources</classifier>
+                  <includes>**/*.java</includes>
+                  <outputDirectory>target/unpacked-sources</outputDirectory>
+                </artifactItem>
+              </artifactItems>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-              <outputDirectory>target/unpacked-sources</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>cleanup-source</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <delete failonerror="false" dir="src"/>
+              </target>
+            </configuration>
+          </execution>
+          <!-- =========================================================== -->
+          <execution>
+            <id>unpack-patches</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy todir="target/unpacked-sources">
+                  <fileset dir="patch">
+                    <include name="**/*.java*"/>
+                  </fileset>
+                </copy>
+                <copy todir="src/main/java">
+                  <fileset dir="target/unpacked-sources">
+                    <include name="**/*.java*"/>
+                  </fileset>
+                </copy>
+              </target>
             </configuration>
           </execution>
         </executions>
@@ -95,12 +144,5 @@
         </configuration>
       </plugin>
     </plugins>
-    
-    <resources>
-      <resource>
-        <directory>target/unpacked-sources</directory>
-        <includes><include>**/*.java</include></includes>
-      </resource>
-    </resources>
   </build>
 </project>
